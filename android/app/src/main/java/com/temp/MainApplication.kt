@@ -1,4 +1,4 @@
-package com.temp
+package com.taptalk
 
 import android.app.Application
 import com.facebook.react.PackageList
