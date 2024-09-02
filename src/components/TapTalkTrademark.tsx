@@ -1,17 +1,18 @@
-import React from 'react'
+import React from 'react';
 import styled from 'styled-components/native';
 
-const TrademargText = styled.Text`
-  font-family: "sans-serif";
-  font-size: 24px;
-`
+const TrademarkText = styled.Text<{ fontSize: string }>`
+  font-family: 'Lobster-Regular';
+  color: black;
+  font-size: ${({ fontSize }) => fontSize};
+`;
 
-const TapTalkTrademark = () => {
-  return (
-    <TrademargText>
-      Tap-Talk
-    </TrademargText>
-  )
+interface TapTalkTrademarkProps {
+  fontSize?: string;
 }
 
-export default TapTalkTrademark
+const TapTalkTrademark: React.FC<TapTalkTrademarkProps> = ({ fontSize }) => {
+  return <TrademarkText fontSize={fontSize ?? '24px'}>Tap-Talk</TrademarkText>;
+};
+
+export default TapTalkTrademark;

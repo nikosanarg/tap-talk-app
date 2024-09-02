@@ -1,101 +1,42 @@
-import React from 'react'
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from 'react-native'
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen'
+import React, { useEffect } from 'react'
+import { ActivityIndicator, SafeAreaView, ScrollView } from 'react-native'
+import TapTalkTrademark from '../components/TapTalkTrademark'
+import styled from 'styled-components/native'
+import TapTalkLogo from '../components/TapTalkLogo'
+import { useNavigation } from '@react-navigation/native'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { RootStackParamList } from '../navigation/AppNavigator'
 
-type SectionProps = {
-  title: string
-  children: React.ReactNode
-}
-
-function Section({ children, title }: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark'
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  )
-}
+type WelcomeScreenNavProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
 
 function WelcomeScreen(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark'
+  const navigation = useNavigation<WelcomeScreenNavProp>()
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('RoleSelection')
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [navigation])
+
+  const LogoView = styled.View`
+    flex: 1;
+    justify-content:center;
+    align-items: center;
+    margin-top: 250px;
+  `
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>WelcomeScreen.tsx</Text> Página Principal BIENVENIDA.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
+    <SafeAreaView>
+      <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <LogoView>
+          <TapTalkLogo width={130} height={160}/>
+          <TapTalkTrademark fontSize='72px'/>
+        </LogoView>
+        <ActivityIndicator size="large" color="#65558F" style={{ marginTop: 20 }} />
       </ScrollView>
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-})
 
 export default WelcomeScreen

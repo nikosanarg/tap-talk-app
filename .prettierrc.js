@@ -7,5 +7,10 @@ module.exports = {
   "tabWidth": 2,
   "useTabs": false,
   "bracketSpacing": true,
-  "arrowParens": "avoid"
+  "arrowParens": "avoid",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": null,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 }
