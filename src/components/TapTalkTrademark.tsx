@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 const TrademarkText = styled.Text<{ fontSize: string }>`
   font-family: 'Lobster-Regular';
   color: black;
+  margin-top: 50px;
   font-size: ${({ fontSize }) => fontSize};
 `;
 

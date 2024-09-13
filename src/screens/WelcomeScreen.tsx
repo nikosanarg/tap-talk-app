@@ -23,7 +23,7 @@ function WelcomeScreen(): React.JSX.Element {
     flex: 1;
     justify-content:center;
     align-items: center;
-    margin-top: 250px;
+    margin-top: 200px;
   `
 
   return (
