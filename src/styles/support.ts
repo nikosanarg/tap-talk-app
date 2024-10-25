@@ -8,6 +8,6 @@ export const SupportText = styled.Text`
 `
 
 export const SupportTexAuthContainer = styled.View`
-  margin: 90px 0 50px;
+  margin: 10px 0;
   width: 90%;
 `

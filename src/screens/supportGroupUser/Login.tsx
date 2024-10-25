@@ -19,8 +19,10 @@ function LoginScreen(): React.JSX.Element {
   const handleLoginFirebase = async () => {
     try {
       await auth().signInWithEmailAndPassword(emailInput, passwordInput);
+      console.log(`✅ Login: Éxito | ${emailInput} | ${passwordInput}`);
       navigation.navigate('SupportGroupMenu');
     } catch (error: any) {
+      console.log(`🚫 Login: Error | ${emailInput} >> ${JSON.stringify(error)}`);
       setErrorMessage(error.message);
     }
   };

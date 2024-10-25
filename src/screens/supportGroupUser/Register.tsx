@@ -6,26 +6,29 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { ButtonsAuthContainer, ButtonSupportText, LinkRegisterButton } from '../../styles/auth';
 import { ScreenView, ReturnButton, ReturnText } from '../../styles/common';
 import auth from '@react-native-firebase/auth';
+import { SupportTexAuthContainer, SupportText } from '../../styles/support';
 
 type RegisterScreenNavProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 function RegisterScreen(): React.JSX.Element {
   const navigation = useNavigation<RegisterScreenNavProp>();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleRegister = async () => {
-    if (password !== confirmPassword) {
+    if (passwordInput !== confirmPassword) {
+      console.log(`🚫 Registro: Las contraseñas no coinciden`);
       setErrorMessage('Las contraseñas no coinciden');
       return;
     }
     try {
-      await auth().createUserWithEmailAndPassword(email, password);
-      console.log('Registro exitoso');
+      await auth().createUserWithEmailAndPassword(emailInput, passwordInput);
+      console.log(`✅ Registro: Éxito | ${emailInput} | ${passwordInput}`);
       navigation.navigate('Login');
     } catch (error: any) {
+      console.log(`🚫 Registro: Error | ${emailInput} >> ${JSON.stringify(error)}`);
       setErrorMessage(error.message);
     }
   };
@@ -38,18 +41,21 @@ function RegisterScreen(): React.JSX.Element {
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <ScreenView>
+        <SupportTexAuthContainer>
+            <SupportText>Usá tu correo electrónico y una contraseña</SupportText>
+          </SupportTexAuthContainer>
           <ButtonsAuthContainer>
             <TextInput
               placeholder="Correo electrónico"
-              value={email}
-              onChangeText={setEmail}
+              value={emailInput}
+              onChangeText={setEmailInput}
               keyboardType="email-address"
               style={{ marginBottom: 10, padding: 10, borderWidth: 1, borderColor: '#ccc' }}
             />
             <TextInput
               placeholder="Contraseña"
-              value={password}
-              onChangeText={setPassword}
+              value={passwordInput}
+              onChangeText={setPasswordInput}
               secureTextEntry
               style={{ marginBottom: 10, padding: 10, borderWidth: 1, borderColor: '#ccc' }}
             />
