@@ -16,6 +16,14 @@ export const LinkFacebookAuthButton = styled(LinkButton)`
   background-color: #999999;
 `;
 
+export const LinkLoginButton = styled(LinkButton)`
+  background-color: #21005D;
+`;
+
+export const LinkRegisterButton = styled(LinkButton)`
+  background-color: #21005D;
+`;
+
 export const ButtonsAuthContainer = styled.View`
   margin: 40px 0 60px;
   width: 100%;

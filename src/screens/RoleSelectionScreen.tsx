@@ -16,7 +16,7 @@ function RoleSelectionScreen(): React.JSX.Element {
   }
 
   const handleClickRoleSupportGroup = () => {
-    navigation.navigate('SupportGroupUserInit')
+    navigation.navigate('Login')
   }
 
   return (

@@ -3,13 +3,17 @@ import { createStackNavigator } from '@react-navigation/stack'
 import WelcomeScreen from '../screens/WelcomeScreen'
 import RoleSelectionScreen from '../screens/RoleSelectionScreen'
 import AssistedUserInitScreen from '../screens/assistedUser/Init';
-import SupportGroupUserInitScreen from '../screens/supportGroupUser/Init';
+import RegisterScreen from '../screens/supportGroupUser/Register';
+import LoginScreen from '../screens/supportGroupUser/Login';
+import SupportGroupMenuScreen from '../screens/supportGroupUser/SupportGroupMenu';
 
 export type RootStackParamList = {
   Welcome: undefined;
   RoleSelection: undefined;
   AssistedUserInit: undefined;
-  SupportGroupUserInit: undefined;
+  Login: undefined;
+  Register: undefined;
+  SupportGroupMenu: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>()
@@ -22,7 +26,9 @@ const AppNavigator = () => {
 
       <Stack.Screen name="AssistedUserInit" component={AssistedUserInitScreen}/>
 
-      <Stack.Screen name="SupportGroupUserInit" component={SupportGroupUserInitScreen}/>
+      <Stack.Screen name="Login" component={LoginScreen}/>
+      <Stack.Screen name="Register" component={RegisterScreen}/>
+      <Stack.Screen name="SupportGroupMenu" component={SupportGroupMenuScreen}/>
     </Stack.Navigator>
   )
 }
