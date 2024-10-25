@@ -4,7 +4,9 @@ import TapTalkTrademark from '../components/TapTalkTrademark'
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { ButtonText, LinkButton, ScreenView, TextView, TitleText } from '../styles/common';
+import { ScreenView, TextView, TitleText } from '../styles/common';
+import { AssistedUserRoleButton, StyledContextualView } from '../styles/auth';
+import { ButtonText, LinkButton } from '../styles/buttons';
 
 type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleSelection'>;
 
@@ -23,20 +25,26 @@ function RoleSelectionScreen(): React.JSX.Element {
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <ScreenView>
-          <TapTalkTrademark fontSize='44px'/>
-          
-          <TextView>
-            <TitleText>Selecciona tu perfil</TitleText>
-            <TitleText>Usuario asistido: Para el usuario bajo cuidado</TitleText>
-            <TitleText>Grupo de apoyo: Para miembros del grupo de ayuda o terapia</TitleText>
-          </TextView>
+          <TapTalkTrademark fontSize='44px' />
 
-          <LinkButton onPress={handleClickRoleAssistedUser}>
-            <ButtonText>Usuario asistido</ButtonText>
-          </LinkButton>
-          <LinkButton onPress={handleClickRoleSupportGroup}>
-            <ButtonText>Grupo de apoyo</ButtonText>
-          </LinkButton>
+          <StyledContextualView>
+            <TextView>
+              <TitleText>Para el usuario bajo cuidado</TitleText>
+            </TextView>
+            <AssistedUserRoleButton onPress={handleClickRoleAssistedUser}>
+              <ButtonText>Usuario asistido</ButtonText>
+            </AssistedUserRoleButton>
+          </StyledContextualView>
+
+          <StyledContextualView>
+            <TextView>
+              <TitleText>Para miembros del grupo de ayuda o terapia</TitleText>
+            </TextView>
+            <LinkButton onPress={handleClickRoleSupportGroup}>
+              <ButtonText>Grupo de apoyo</ButtonText>
+            </LinkButton>
+          </StyledContextualView>
+
         </ScreenView>
       </ScrollView>
     </SafeAreaView>

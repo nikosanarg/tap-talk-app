@@ -3,9 +3,9 @@ import { createStackNavigator } from '@react-navigation/stack'
 import WelcomeScreen from '../screens/WelcomeScreen'
 import RoleSelectionScreen from '../screens/RoleSelectionScreen'
 import AssistedUserInitScreen from '../screens/assistedUser/Init';
-import RegisterScreen from '../screens/supportGroupUser/Register';
-import LoginScreen from '../screens/supportGroupUser/Login';
-import SupportGroupMenuScreen from '../screens/supportGroupUser/SupportGroupMenu';
+import LoginScreen from '../screens/supportGroupUser/LoginScreen';
+import RegisterScreen from '../screens/supportGroupUser/RegisterScreen';
+import SupportGroupMenuScreen from '../screens/supportGroupUser/SupportGroupMenuScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;

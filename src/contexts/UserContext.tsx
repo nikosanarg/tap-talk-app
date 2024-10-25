@@ -3,13 +3,13 @@ import { FirestoreUser } from '../types/User'
 
 interface UserContextType {
   user: FirestoreUser | null;
-  setUser: React.Dispatch<React.SetStateAction<FirestoreUser | null>>;
+  setUser: React.Dispatch<React.SetStateAction<any | null>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<FirestoreUser | null>(null);
+  const [user, setUser] = useState<any | null>(null);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
