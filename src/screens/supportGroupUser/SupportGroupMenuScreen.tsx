@@ -1,12 +1,14 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, Text, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, ScrollView } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { StyledContextualView, SupportText, SupportTextAuthContainer } from '../../styles/auth';
-import { ActionButtonText, GroupActionButton, LogoutActionButton, MenuActionButton } from '../../styles/buttons';
-import { GroupCard, GroupSubtitle, GroupTextContainer, GroupTitle } from '../../styles/assistCard';
+import { StyledContextualView, SupportText } from '../../styles/auth';
+import { ActionButtonText, MenuActionButton } from '../../styles/buttons';
+import { LogoutActionButton, SupportGroupListContainer } from '../../styles/supportGroup';
 import { useUser } from '../../contexts/UserContext';
+import { SupportGroupHeaderContainer } from '../../styles/supportGroup';
+import SupportGroupCard from '../../components/SupportGroupCard';
 
 type SupportGroupMenuScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupMenu'>;
 
@@ -39,25 +41,14 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <StyledContextualView>
-          <SupportTextAuthContainer>
+          <SupportGroupHeaderContainer>
             <SupportText>{`¡Hola${user?.nombre ? `, ${user.nombre}` : ''}!`}</SupportText>
-          </SupportTextAuthContainer>
-          <LogoutActionButton onPress={handleLogout}>
-            <ActionButtonText>Cerrar sesión</ActionButtonText>
-          </LogoutActionButton>
+            <LogoutActionButton onPress={handleLogout}>
+              <ActionButtonText>Cerrar sesión</ActionButtonText>
+            </LogoutActionButton>
+          </SupportGroupHeaderContainer>
         </StyledContextualView>
 
-        {mockGroups.map(group => (
-          <GroupCard key={group.id}>
-            <GroupTextContainer>
-              <GroupTitle>Asistiendo a {group.name}</GroupTitle>
-              <GroupSubtitle>desde {group.date}</GroupSubtitle>
-            </GroupTextContainer>
-            <GroupActionButton>
-              <ActionButtonText>➡️</ActionButtonText>
-            </GroupActionButton>
-          </GroupCard>
-        ))}
         <StyledContextualView>
           <MenuActionButton onPress={handleJoinGroup}>
             <ActionButtonText>Unirse a un grupo existente</ActionButtonText>
@@ -66,6 +57,12 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
             <ActionButtonText>Crear nuevo grupo</ActionButtonText>
           </MenuActionButton>
         </StyledContextualView>
+
+        <SupportGroupListContainer>
+          {mockGroups.map(group => (
+            <SupportGroupCard key={group.id} group={group} />
+          ))}
+        </SupportGroupListContainer>
       </ScrollView>
     </SafeAreaView>
   );

@@ -16,28 +16,18 @@ export const ButtonText = styled.Text`
   text-align: center;
 `
 
-const ActionButton = styled.TouchableOpacity`
-  padding: 10px 50px;
+export const ActionButton = styled.TouchableOpacity`
+  padding: 10px 20px;
   margin-bottom: 20px;
   align-items: center;
   justify-content: center;
   width: fit-content;
-  border-radius: 4px;
+  border-radius: 8px;
 `
-
-export const LogoutActionButton = styled(ActionButton)`
-  background-color: #E05154;
-  color: #FFFFFF;
-`;
-
-export const GroupActionButton = styled(ActionButton)`
-  background-color: #E05154;
-  color: #FFFFFF;
-`;
 
 export const MenuActionButton = styled(ActionButton)`
   background-color: #65558F;
-  width: 86%;
+  width: 66%;
   color: #FFFFFF;
 `;
 

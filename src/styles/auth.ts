@@ -28,7 +28,7 @@ export const StyledAuthTextInput = styled(TextInput)`
 `
 
 export const StyledContextualView = styled.View`
-  margin: 50px 0 0;
+  margin: 20px 0 0;
   width: 100%;
   align-items: center;
 `
