@@ -29,7 +29,6 @@ function CreateGroupScreen(): React.JSX.Element {
       return
     }
 
-    console.log(user)
     console.log(`🟣 Iniciando Creación de Grupo: assistedUser=${assistedUserName} | creadorId=${user.uid}`);
   
     try {
@@ -49,7 +48,6 @@ function CreateGroupScreen(): React.JSX.Element {
       console.error('🚫 Error al crear el grupo: ', error);
     }
   };
-  
 
   return (
     <SafeAreaView>

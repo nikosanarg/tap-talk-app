@@ -64,7 +64,6 @@ function JoinGroupScreen(): React.JSX.Element {
     }
   };
   
-
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">

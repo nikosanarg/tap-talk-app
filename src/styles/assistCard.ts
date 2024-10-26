@@ -5,7 +5,7 @@ export const GroupCard = styled.View`
   background-color: #F7F7F7;
   border: 1px solid #AAAAAA;
   padding: 0px 16px 0px 32px;
-  margin: 4px;
+  margin: 2px 4px;
   width: 86%;
   border-radius: 12px;
   flex-direction: row;

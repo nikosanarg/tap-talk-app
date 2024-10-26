@@ -3,8 +3,9 @@ import { ActionButton } from "../../styles/buttons";
 
 export const SupportGroupHeaderContainer = styled.View`
   width: 100%;
-  background-color: rgb(250, 190, 230);
-  padding: 5px 16px 2px 50px;
+  margin: 0 0 20px 0;
+  background-color: rgb(250, 205, 238);
+  padding: 5px 16px 2px 30px;
   display: flex;
   flex-direction: row;
   align-items: center;
