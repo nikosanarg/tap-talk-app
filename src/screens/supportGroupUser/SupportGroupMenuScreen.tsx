@@ -1,5 +1,5 @@
-import React from 'react';
-import { SafeAreaView, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
@@ -9,18 +9,47 @@ import { LogoutActionButton, SupportGroupListContainer } from '../../styles/supp
 import { useUser } from '../../contexts/UserContext';
 import { SupportGroupHeaderContainer } from '../../styles/supportGroup';
 import SupportGroupCard from '../../components/SupportGroupCard';
+import firestore from '@react-native-firebase/firestore';
+import { IFirestoreSupportGroup } from '../../types/SupportGroup';
 
 type SupportGroupMenuScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupMenu'>;
 
 const SupportGroupMenuScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupMenuScreenNavProp>();
   const { user } = useUser();
+  const [groups, setGroups] = useState<IFirestoreSupportGroup[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const mockGroups = [
-    { id: 1, name: 'Juan', date: '23/08/2024' },
-    { id: 2, name: 'Maria', date: '21/06/2024' },
-    { id: 3, name: 'Eusebio', date: '16/12/2023' },
-  ];
+  useEffect(() => {
+    if (!user?.uid) {
+      console.log("🚫 Error: Usuario no autenticado");
+      setErrorMessage("Error: Usuario no autenticado.");
+      return;
+    }
+
+    const fetchGroups = async () => {
+      try {
+        console.log(`🟢 Buscando grupos para el usuario UID=${user.uid}`);
+        const querySnapshot = await firestore()
+          .collection('Grupos')
+          .where('miembros', 'array-contains', user.uid)
+          .get();
+
+        const fetchedGroups: IFirestoreSupportGroup[] = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as IFirestoreSupportGroup[];
+
+        setGroups(fetchedGroups);
+        console.log("✅ Grupos obtenidos correctamente:", fetchedGroups);
+      } catch (error) {
+        console.error("🚫 Error al obtener los grupos:", error);
+        setErrorMessage("Error al cargar los grupos.");
+      }
+    };
+
+    fetchGroups();
+  }, [user?.uid]);
 
   const handleLogout = () => {
     navigation.reset({
@@ -30,11 +59,11 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
   };
 
   const handleJoinGroup = () => {
-    // Acción para unirse a un grupo
+    navigation.navigate('JoinGroup');
   };
 
   const handleCreateGroup = () => {
-    // Acción para crear un grupo nuevo
+    navigation.navigate('CreateGroup');
   };
 
   return (
@@ -58,10 +87,16 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
           </MenuActionButton>
         </StyledContextualView>
 
+        {errorMessage ? <Text style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Text> : null}
+
         <SupportGroupListContainer>
-          {mockGroups.map(group => (
-            <SupportGroupCard key={group.id} group={group} />
-          ))}
+          {groups.length > 0 ? (
+            groups.map(group => (
+              <SupportGroupCard key={group.id} group={group} />
+            ))
+          ) : (
+            <Text style={{ textAlign: 'center', marginTop: 10 }}>No estás unido a ningún grupo.</Text>
+          )}
         </SupportGroupListContainer>
       </ScrollView>
     </SafeAreaView>

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { AuthService } from '../services/AuthService'
 import { FirebaseAuthTypes } from '@react-native-firebase/auth'
-import { FirestoreUser } from '../types/User'
+import { IFirestoreUser } from '../types/User'
 import { apiFunctions } from '../services/apiFunctions'
 
 export const useAuth = () => {
-  const [user, setUser] = useState<FirestoreUser | null>(null)
+  const [user, setUser] = useState<IFirestoreUser | null>(null)
   const [loadingAuth, setLoadingAuth] = useState(true)
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export const useAuth = () => {
     try {
       setLoadingAuth(true)
       const authResponse: FirebaseAuthTypes.User = await apiFunctions.loginUser(email, password)
-      const userObject: FirestoreUser = await apiFunctions.getUser(authResponse.uid)
+      const userObject: IFirestoreUser = await apiFunctions.getUser(authResponse.uid)
       setUser(userObject)
     } catch (error: any) {
       throw new Error(`Error logging in auth process: ${error.message}`)

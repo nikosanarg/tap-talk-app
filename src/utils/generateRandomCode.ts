@@ -1,7 +1,7 @@
-export const generateRandomCode = () => {
+export const generateRandomCode = (baselength: number) => {
   let id = ''
-  while (id.length < 16) {
+  while (id.length < baselength) {
     id += Math.random().toString(36).slice(2)
   }
-  return id.slice(0, 16)
+  return id.slice(0, baselength)
 }

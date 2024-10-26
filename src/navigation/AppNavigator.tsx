@@ -6,6 +6,8 @@ import AssistedUserInitScreen from '../screens/assistedUser/Init';
 import LoginScreen from '../screens/supportGroupUser/LoginScreen';
 import RegisterScreen from '../screens/supportGroupUser/RegisterScreen';
 import SupportGroupMenuScreen from '../screens/supportGroupUser/SupportGroupMenuScreen';
+import CreateGroupScreen from '../screens/supportGroupUser/CreateGroupScreen';
+import JoinGroupScreen from '../screens/supportGroupUser/JoinGroupScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -14,6 +16,8 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   SupportGroupMenu: undefined;
+  CreateGroup: undefined;
+  JoinGroup: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>()
@@ -29,6 +33,9 @@ const AppNavigator = () => {
       <Stack.Screen name="Login" component={LoginScreen}/>
       <Stack.Screen name="Register" component={RegisterScreen}/>
       <Stack.Screen name="SupportGroupMenu" component={SupportGroupMenuScreen}/>
+
+      <Stack.Screen name="CreateGroup" component={CreateGroupScreen}/>
+      <Stack.Screen name="JoinGroup" component={JoinGroupScreen}/>
     </Stack.Navigator>
   )
 }

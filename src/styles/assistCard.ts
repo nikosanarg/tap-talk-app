@@ -35,9 +35,9 @@ export const GroupActionButton = styled(ActionButton)`
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-`;
-
-export const GroupActionRightIcon = styled.Text`
+  `;
+  
+  export const GroupActionRightIcon = styled.Text`
   font-size: 48px;
   color: #C7B0FF;
   text-align: center;

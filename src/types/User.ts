@@ -1,9 +1,9 @@
-export interface FirestoreUser {
+export interface IFirestoreUser {
   uid: string
   email: string | null
   nombre: string | null
   authProvider: string
-  rol?: 'apoyo' | 'asistido'
+  rol?: 'support' | 'assisted'
   activo?: boolean
   fechaCreacion?: Date
   grupoIDs?: string[]

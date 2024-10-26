@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { FirestoreUser } from '../types/User'
+import { IFirestoreUser } from '../types/User'
 
 interface UserContextType {
-  user: FirestoreUser | null;
+  user: IFirestoreUser | null;
   setUser: React.Dispatch<React.SetStateAction<any | null>>;
 }
 

@@ -42,7 +42,7 @@ function LoginScreen(): React.JSX.Element {
         setErrorMessage(`🚫 Login: Error autenticando en el servicio de Firebase `);
         return
       }
-      console.log(`✅ Login: Éxito | userCredential:`, authenticatedUser);
+      console.log(`✅ Login: Éxito | userCredential.user:`, authenticatedUser?.user);
       await AsyncStorage.setItem('@lastEmail', emailInput);
       const userDocument = await firestore().collection('Usuarios').doc(authenticatedUser.user.uid).get();
       if (!userDocument.exists) {
@@ -50,13 +50,13 @@ function LoginScreen(): React.JSX.Element {
         setErrorMessage(`🚫 Login: Error recuperando el registro de Firestore `);
         return
       }
-      console.log(`✅ Login: Éxito | userDocument:`, userDocument);
+      console.log(`✅ Login: Éxito | userDocument.data:`, userDocument?.data);
       const userData = userDocument.data();
-      setUser(userData || null);
+      setUser({ uid: authenticatedUser.user.uid, ...userData });
       navigation.navigate('SupportGroupMenu');
     } catch (error: any) {
       console.log(`🚫 Login: Error | ${emailInput}`, error);
-    setErrorMessage('🚫 ' + error.message);
+      setErrorMessage('🚫 ' + error.message);
     }
   };
 

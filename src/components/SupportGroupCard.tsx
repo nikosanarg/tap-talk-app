@@ -1,17 +1,18 @@
 import React from 'react';
 import { GroupActionRightIcon, GroupCard, GroupSubtitle, GroupTextContainer, GroupTitle } from '../styles/assistCard';
-import { ISupportGroup } from '../types/SupportGroup';
+import { IFirestoreSupportGroup } from '../types/SupportGroup';
+import { formatDate } from '../utils/formatDate';
 
 interface ISupportGroupCardProps {
-  group: ISupportGroup;
+  group: IFirestoreSupportGroup;
 }
 
 const SupportGroupCard = ({ group }: ISupportGroupCardProps) => {
   return (
     <GroupCard>
       <GroupTextContainer>
-        <GroupTitle>👤 {group.name}</GroupTitle>
-        <GroupSubtitle>desde {group.date}</GroupSubtitle>
+        <GroupTitle>👤 {group.nombreAsistido}</GroupTitle>
+        <GroupSubtitle>desde {formatDate(group.fechaCreacion)}</GroupSubtitle>
       </GroupTextContainer>
       <GroupActionRightIcon>➲</GroupActionRightIcon>
     </GroupCard>
