@@ -6,7 +6,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTextInput, SupportTextAuthContainer, SupportText } from '../../styles/auth';
 import { ScreenView } from '../../styles/common';
 import auth from '@react-native-firebase/auth';
-import ReturnButton from '../../components/ReturnButton';
+import ReturnButton from '../../components/returnButton/ReturnButton';
 import firestore from '@react-native-firebase/firestore';
 
 type RegisterScreenNavProp = StackNavigationProp<RootStackParamList, 'Register'>;

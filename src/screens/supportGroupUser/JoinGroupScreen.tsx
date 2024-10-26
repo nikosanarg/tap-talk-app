@@ -7,7 +7,7 @@ import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTe
 import { ScreenView } from '../../styles/common';
 import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
-import ReturnButton from '../../components/ReturnButton';
+import ReturnButton from '../../components/returnButton/ReturnButton';
 
 type JoinGroupScreenNavProp = StackNavigationProp<RootStackParamList, 'JoinGroup'>;
 

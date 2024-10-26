@@ -6,7 +6,7 @@ import { ScreenView } from '../../styles/common';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTextInput, AuthSecondaryButton, SupportTextAuthContainer, SupportText } from '../../styles/auth';
 import auth from '@react-native-firebase/auth';
-import ReturnButton from '../../components/ReturnButton';
+import ReturnButton from '../../components/returnButton/ReturnButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';

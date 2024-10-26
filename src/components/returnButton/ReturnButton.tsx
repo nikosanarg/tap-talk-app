@@ -1,9 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react'
-import { RootStackParamList } from '../navigation/AppNavigator';
-import { StyledReturnButton, StyledReturnText } from '../styles/returnButton';
-import { StyledContextualView } from '../styles/auth';
+import { RootStackParamList } from '../../navigation/AppNavigator';
+import { StyledReturnButton, StyledReturnText } from './returnButton';
+import { StyledContextualView } from '../../styles/auth';
 
 interface ReturnButtonProps {
   screenName: keyof RootStackParamList;
