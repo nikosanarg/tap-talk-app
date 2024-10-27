@@ -8,6 +8,7 @@ import RegisterScreen from '../screens/supportGroupUser/RegisterScreen';
 import SupportGroupMenuScreen from '../screens/supportGroupUser/SupportGroupMenuScreen';
 import CreateGroupScreen from '../screens/supportGroupUser/CreateGroupScreen';
 import JoinGroupScreen from '../screens/supportGroupUser/JoinGroupScreen';
+import SupportGroupHomeScreen from '../screens/supportGroupUser/group/SupportGroupHomeScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -18,6 +19,7 @@ export type RootStackParamList = {
   SupportGroupMenu: undefined;
   CreateGroup: undefined;
   JoinGroup: undefined;
+  SupportGroupHome: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>()
@@ -36,6 +38,8 @@ const AppNavigator = () => {
 
       <Stack.Screen name="CreateGroup" component={CreateGroupScreen}/>
       <Stack.Screen name="JoinGroup" component={JoinGroupScreen}/>
+
+      <Stack.Screen name="SupportGroupHome" component={SupportGroupHomeScreen}/>
     </Stack.Navigator>
   )
 }

@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react'
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { StyledReturnButton, StyledReturnText } from './returnButton';
+import { StyledReturnButton, StyledReturnText } from './returnButtonStyled';
 import { StyledContextualView } from '../../styles/auth';
 
 interface ReturnButtonProps {

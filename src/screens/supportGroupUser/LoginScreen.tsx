@@ -6,10 +6,10 @@ import { ScreenView } from '../../styles/common';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTextInput, AuthSecondaryButton, SupportTextAuthContainer, SupportText } from '../../styles/auth';
 import auth from '@react-native-firebase/auth';
-import ReturnButton from '../../components/returnButton/ReturnButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
+import ReturnButton from '../../components/returnButton/ReturnButton';
 
 type LoginScreenNavProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -50,7 +50,7 @@ function LoginScreen(): React.JSX.Element {
         setErrorMessage(`🚫 Login: Error recuperando el registro de Firestore `);
         return
       }
-      console.log(`✅ Login: Éxito | userDocument.data:`, userDocument?.data);
+      console.log(`✅ Login: Éxito | userDocument.data:`, JSON.stringify(userDocument?.data));
       const userData = userDocument.data();
       setUser({ uid: authenticatedUser.user.uid, ...userData });
       navigation.navigate('SupportGroupMenu');

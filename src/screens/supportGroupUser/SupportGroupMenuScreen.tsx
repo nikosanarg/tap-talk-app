@@ -12,12 +12,14 @@ import firestore from '@react-native-firebase/firestore';
 import { IFirestoreSupportGroup } from '../../types/SupportGroup';
 import { Picker } from '@react-native-picker/picker';
 import Header from '../../components/header/Header';
+import { useSupportGroup } from '../../contexts/SupportGroupContext';
 
 type SupportGroupMenuScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupMenu'>;
 
 const SupportGroupMenuScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupMenuScreenNavProp>();
   const { user } = useUser();
+  const { supportGroup, setSupportGroup } = useSupportGroup()
   const [groups, setGroups] = useState<IFirestoreSupportGroup[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<string>('recentFirst');
@@ -86,6 +88,12 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
     navigation.navigate('CreateGroup');
   };
 
+  const handleClickGroup = (group: IFirestoreSupportGroup) => {
+    console.log(`🟢 Navegando a la Home del Grupo=${JSON.stringify(group)}`);
+    setSupportGroup(group)
+    navigation.navigate('SupportGroupHome');
+  };
+
   return (
     <SafeAreaView>
       <Header user={user} handleLogout={handleLogout} />
@@ -104,7 +112,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
           <Picker
             selectedValue={sortOption}
             onValueChange={(value) => setSortOption(value)}
-            style={{ width: '66%', backgroundColor: '#f0f0f0', borderRadius: 10 }}
+            style={{ width: '80%', backgroundColor: '#e7e4e0', borderRadius: 10 }}
           >
             <Picker.Item label="Más recientes primero" value="recentFirst" />
             <Picker.Item label="Más antiguos primero" value="oldestFirst" />
@@ -118,7 +126,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
         <SupportGroupListContainer>
           {groups.length > 0 ? (
             groups.map(group => (
-              <SupportGroupCard key={group.id} group={group} />
+              <SupportGroupCard group={group} callback={() => handleClickGroup(group)} key={group.id} />
             ))
           ) : (
             <Text style={{ textAlign: 'center', marginTop: 10 }}>No estás unido a ningún grupo.</Text>

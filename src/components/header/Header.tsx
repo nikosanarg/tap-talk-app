@@ -1,6 +1,6 @@
 import React from 'react'
 import { IFirestoreUser } from '../../types/User'
-import { HeaderText, LogoutActionButton, LogoutButtonText, SupportGroupHeaderContainer } from './header'
+import { HeaderText, LogoutActionButton, LogoutButtonText, SupportGroupHeaderContainer } from './headerStyled'
 
 interface HeaderProps {
   user: IFirestoreUser | null

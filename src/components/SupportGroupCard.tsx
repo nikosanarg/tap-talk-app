@@ -5,16 +5,17 @@ import { formatDate } from '../utils/formatDate';
 
 interface ISupportGroupCardProps {
   group: IFirestoreSupportGroup;
+  callback: () => void
 }
 
-const SupportGroupCard = ({ group }: ISupportGroupCardProps) => {
+const SupportGroupCard = ({ group, callback }: ISupportGroupCardProps) => {
   return (
     <GroupCard>
       <GroupTextContainer>
         <GroupTitle>👤 {group.nombreAsistido}</GroupTitle>
         <GroupSubtitle>desde {formatDate(group.fechaCreacion)}</GroupSubtitle>
       </GroupTextContainer>
-      <GroupActionRightIcon>➲</GroupActionRightIcon>
+      <GroupActionRightIcon onPress={callback}>➲</GroupActionRightIcon>
     </GroupCard>
   )
 }
