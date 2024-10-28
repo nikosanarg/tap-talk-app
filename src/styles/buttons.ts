@@ -31,6 +31,12 @@ export const MenuActionButton = styled(ActionButton)`
   color: #FFFFFF;
 `;
 
+export const DangerActionButton = styled(ActionButton)`
+  background-color: #FF0000;
+  width: 66%;
+  color: #FFFFFF;
+`;
+
 export const ActionButtonText = styled.Text`
   color: white;
   font-size: 16px;

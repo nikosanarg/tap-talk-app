@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TextInput, Button, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, Text, Alert, Button } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../../../contexts/UserContext';
 import { StyledAuthTextInput, StyledContextualView, SupportText } from '../../../styles/auth';
 import { HeaderBoldTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
-import { ActionButtonText, MenuActionButton } from '../../../styles/buttons';
+import { ActionButtonText, DangerActionButton, MenuActionButton } from '../../../styles/buttons';
 import Header from '../../../components/header/Header';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useSupportGroup } from '../../../contexts/SupportGroupContext';
@@ -103,6 +103,51 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
     }
   };
 
+  const handleDeleteGroup = async () => {
+    if (!supportGroup?.id) return;
+
+    try {
+      // Eliminar la colección de notificaciones del grupo
+      const notificationsSnapshot = await firestore()
+        .collection('Notificaciones')
+        .where('grupoId', '==', supportGroup.id)
+        .get();
+
+      const batch = firestore().batch();
+      notificationsSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+
+      // Eliminar el grupo
+      await firestore()
+        .collection('Grupos')
+        .doc(supportGroup.id)
+        .delete();
+
+      Alert.alert("Grupo eliminado", `El grupo de ${supportGroup.nombreAsistido} ha sido eliminado.`);
+      console.log(`🚮 Grupo ${supportGroup.id} eliminado.`);
+
+      // Actualizar el contexto y volver al menú
+      setSupportGroup(null);
+      navigation.navigate('SupportGroupMenu');
+    } catch (error) {
+      console.error("🚫 Error al eliminar el grupo:", error);
+      setErrorMessage("Error al eliminar el grupo.");
+    }
+  };
+
+  const confirmDeleteGroup = () => {
+    Alert.alert(
+      "Confirmar eliminación",
+      `¿Estás seguro de que deseas eliminar el grupo de ${supportGroup?.nombreAsistido}? Esta acción es permanente e irreversible.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", style: "destructive", onPress: handleDeleteGroup },
+      ]
+    );
+  };
+
   const handleGoToHome = () => {
     navigation.navigate('SupportGroupHome');
   };
@@ -114,9 +159,8 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <HeaderBoldTitle>Configuración de grupo</HeaderBoldTitle>
 
-        <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Nombre del usuario asistido</SupportText>
-
         <StyledContextualView>
+          <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Nombre del usuario asistido</SupportText>
           <StyledAuthTextInput
             placeholder="Nuevo nombre"
             value={groupName}
@@ -140,6 +184,9 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
         </SupportGroupListContainer>
 
         <StyledContextualView>
+          <DangerActionButton onPress={confirmDeleteGroup}>
+            <ActionButtonText>Eliminar grupo</ActionButtonText>
+          </DangerActionButton>
           <MenuActionButton onPress={handleGoToHome}>
             <ActionButtonText>Ir al menú</ActionButtonText>
           </MenuActionButton>
