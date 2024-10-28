@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Text } from 'react-native';
+import { SafeAreaView, ScrollView, Text, TextInput, Button, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../../../contexts/UserContext';
-import { StyledContextualView, SupportText } from '../../../styles/auth';
+import { StyledAuthTextInput, StyledContextualView, SupportText } from '../../../styles/auth';
 import { HeaderBoldTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
 import { ActionButtonText, MenuActionButton } from '../../../styles/buttons';
 import Header from '../../../components/header/Header';
@@ -20,6 +20,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
   const { supportGroup, setSupportGroup } = useSupportGroup();
   const [members, setMembers] = useState<Array<{ id: string; nombre: string }>>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [groupName, setGroupName] = useState(supportGroup?.nombreAsistido || '');
 
   useEffect(() => {
     fetchMembers();
@@ -75,6 +76,33 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
     }
   };
 
+  const handleSaveGroupName = async () => {
+    if (!groupName.trim()) {
+      Alert.alert("Error", "El nombre no puede estar vacío.");
+      return;
+    }
+
+    try {
+      await firestore()
+        .collection('Grupos')
+        .doc(supportGroup?.id)
+        .update({
+          nombreAsistido: groupName
+        });
+
+      setSupportGroup(prevGroup => ({
+        ...prevGroup!,
+        nombreAsistido: groupName
+      }));
+
+      Alert.alert("Éxito", "El nombre del usuario asistido ha sido actualizado.");
+      console.log(`✅ Nombre del asistido actualizado a: ${groupName}`);
+    } catch (error) {
+      console.error("🚫 Error al actualizar el nombre del usuario asistido:", error);
+      setErrorMessage("Error al actualizar el nombre del usuario asistido.");
+    }
+  };
+
   const handleGoToHome = () => {
     navigation.navigate('SupportGroupHome');
   };
@@ -85,6 +113,19 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <HeaderBoldTitle>Configuración de grupo</HeaderBoldTitle>
+
+        <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Nombre del usuario asistido</SupportText>
+
+        <StyledContextualView>
+          <StyledAuthTextInput
+            placeholder="Nuevo nombre"
+            value={groupName}
+            onChangeText={setGroupName}
+          />
+          <MenuActionButton onPress={handleSaveGroupName}>
+            <ActionButtonText>Guardar nombre</ActionButtonText>
+          </MenuActionButton>
+        </StyledContextualView>
 
         <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Miembros del grupo</SupportText>
 
