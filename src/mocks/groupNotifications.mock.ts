@@ -4,7 +4,7 @@ import { Timestamp } from "@react-native-firebase/firestore";
 export const groupNotificationsMock: Array<INotification> = [
   {
     id: '1',
-    categoria: 'Alimento',
+    categoria: 'A',
     titulo: 'Desayuno',
     grupoId: 'XE2atLh950J4XlBf0biv',
     resuelta: false,
@@ -15,7 +15,7 @@ export const groupNotificationsMock: Array<INotification> = [
   },
   {
     id: '2',
-    categoria: 'Salud',
+    categoria: 'S',
     titulo: 'Medicamento',
     grupoId: 'XE2atLh950J4XlBf0biv',
     resuelta: true,
@@ -26,7 +26,7 @@ export const groupNotificationsMock: Array<INotification> = [
   },
   {
     id: '3',
-    categoria: 'Social',
+    categoria: 'S',
     titulo: 'Abrazo',
     grupoId: 'XE2atLh950J4XlBf0biv',
     resuelta: false,

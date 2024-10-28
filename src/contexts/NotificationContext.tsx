@@ -20,7 +20,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     if (supportGroup?.id) {
       fetchNotifications();
     }
-  }, [supportGroup?.id]);
+  }, [supportGroup]);
 
   const fetchNotifications = async () => {
     if (!supportGroup) {
@@ -34,12 +34,12 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
         .orderBy('fechaCreacion', 'desc')
         .get();
         
-        const fetchedNotifications = notificationsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as INotification[];
+      const fetchedNotifications = notificationsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as INotification[];
         
-      console.log('✅ Obtención de notificaciones para el grupo ', supportGroup.id, JSON.stringify(fetchedNotifications));
+      console.log(`📩 Notificaciones para el Grupo "${supportGroup.id}" (${fetchedNotifications.length})`);
       setNotifications(fetchedNotifications);
     } catch (error) {
       console.log("🚫 Error al obtener notificaciones:", error);

@@ -15,7 +15,7 @@ type LoginScreenNavProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
 function LoginScreen(): React.JSX.Element {
   const navigation = useNavigation<LoginScreenNavProp>();
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -42,7 +42,6 @@ function LoginScreen(): React.JSX.Element {
         setErrorMessage(`🚫 Login: Error autenticando en el servicio de Firebase `);
         return
       }
-      console.log(`✅ Login: Éxito | userCredential.user:`, authenticatedUser?.user);
       await AsyncStorage.setItem('@lastEmail', emailInput);
       const userDocument = await firestore().collection('Usuarios').doc(authenticatedUser.user.uid).get();
       if (!userDocument.exists) {
@@ -50,9 +49,9 @@ function LoginScreen(): React.JSX.Element {
         setErrorMessage(`🚫 Login: Error recuperando el registro de Firestore `);
         return
       }
-      console.log(`✅ Login: Éxito | userDocument.data:`, JSON.stringify(userDocument?.data));
       const userData = userDocument.data();
       setUser({ uid: authenticatedUser.user.uid, ...userData });
+      console.log(`✅ Login exitoso para`, emailInput, authenticatedUser.user.uid);
       navigation.navigate('SupportGroupMenu');
     } catch (error: any) {
       console.log(`🚫 Login: Error | ${emailInput}`, error);

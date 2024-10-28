@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Importa useFocusEffect
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, SupportText } from '../../styles/auth';
 import { ActionButtonText, MenuActionButton } from '../../styles/buttons';
 import { SupportGroupListContainer } from '../../styles/supportGroup';
 import { useUser } from '../../contexts/UserContext';
-import SupportGroupCard from '../../components/SupportGroupCard';
+import AssistCard from '../../components/AssistCard';
 import firestore from '@react-native-firebase/firestore';
 import { IFirestoreSupportGroup } from '../../types/SupportGroup';
 import { Picker } from '@react-native-picker/picker';
@@ -32,7 +32,6 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
     }
 
     try {
-      console.log(`🟢 Buscando grupos para el usuario UID=${user.uid}`);
       const querySnapshot = await firestore()
         .collection('Grupos')
         .where('miembros', 'array-contains', user.uid)
@@ -45,7 +44,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
 
       const sortedGroups = sortGroups(fetchedGroups, sortOption);
       setGroups(sortedGroups);
-      console.log("✅ Grupos obtenidos correctamente y ordenados:", sortedGroups);
+      console.log("🎭 Grupos obtenidos correctamente y ordenados:", sortedGroups.map(sg => sg.nombreAsistido));
     } catch (error) {
       console.error("🚫 Error al obtener los grupos:", error);
       setErrorMessage("Error al cargar los grupos.");
@@ -89,7 +88,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
   };
 
   const handleClickGroup = (group: IFirestoreSupportGroup) => {
-    console.log(`🟢 Navegando a la Home del Grupo=${JSON.stringify(group)}`);
+    console.log(`🟢 Navegando a la Home del Grupo "${group.id}" (${group.nombreAsistido})`);
     setSupportGroup(group)
     navigation.navigate('SupportGroupHome');
   };
@@ -126,7 +125,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
         <SupportGroupListContainer>
           {groups.length > 0 ? (
             groups.map(group => (
-              <SupportGroupCard group={group} callback={() => handleClickGroup(group)} key={group.id} />
+              <AssistCard group={group} callback={() => handleClickGroup(group)} key={group.id} />
             ))
           ) : (
             <Text style={{ textAlign: 'center', marginTop: 10 }}>No estás unido a ningún grupo.</Text>

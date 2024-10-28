@@ -10,3 +10,9 @@ export interface IFirestoreSupportGroup {
   nombreAsistido: string;
   pictogramasPersonalizados?: string[];
 }
+
+export interface IFirestoreSupportMember {
+  id: string
+  nombre: string | null
+  fechaCreacion?: Timestamp
+}

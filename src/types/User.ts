@@ -1,3 +1,5 @@
+import { Timestamp } from "@react-native-firebase/firestore"
+
 export interface IFirestoreUser {
   uid: string
   email: string | null
@@ -5,7 +7,7 @@ export interface IFirestoreUser {
   authProvider: string
   rol?: 'support' | 'assisted'
   activo?: boolean
-  fechaCreacion?: Date
+  fechaCreacion?: Timestamp
   grupoIDs?: string[]
   pictogramasFavoritos?: string[]
 }
