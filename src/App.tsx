@@ -5,17 +5,20 @@ import { UserProvider } from './contexts/UserContext'
 import AppNavigator from './navigation/AppNavigator'
 import { SupportGroupProvider } from './contexts/SupportGroupContext'
 import { NotificationsProvider } from './contexts/NotificationContext'
+import { CategoriesProvider } from './contexts/CategoriesContext'
 
 function App(): React.JSX.Element {
   return (
     <UserProvider>
       <SupportGroupProvider>
         <NotificationsProvider>
-          <NavigationContainer>
-            <SafeAreaView style={{ flex: 1 }}>
-              <AppNavigator />
-            </SafeAreaView>
-          </NavigationContainer>
+          <CategoriesProvider>
+            <NavigationContainer>
+              <SafeAreaView style={{ flex: 1 }}>
+                <AppNavigator />
+              </SafeAreaView>
+            </NavigationContainer>
+          </CategoriesProvider>
         </NotificationsProvider>
       </SupportGroupProvider>
     </UserProvider>
