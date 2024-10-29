@@ -9,6 +9,7 @@ import firestore from '@react-native-firebase/firestore';
 import ReturnButton from '../../components/returnButton/ReturnButton';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
 import { IFirestoreSupportGroup } from '../../types/SupportGroup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LinkScreenNavProp = StackNavigationProp<RootStackParamList, 'Link'>;
 
@@ -36,6 +37,8 @@ function LinkScreen(): React.JSX.Element {
       const groupDoc = groupSnapshot.docs[0];
       const groupData: IFirestoreSupportGroup = groupDoc.data() as IFirestoreSupportGroup;
       console.log(`🔵 Grupo encontrado: ID=${groupDoc.id}, Datos: ${JSON.stringify(groupData)}`);
+
+      await AsyncStorage.setItem('groupId', groupDoc.id);
       setSupportGroup(groupData)
       navigation.navigate('Categories');
     } catch (error) {
