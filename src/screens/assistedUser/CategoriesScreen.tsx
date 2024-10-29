@@ -1,22 +1,39 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCategories } from '../../contexts/CategoriesContext';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
-import { CategoryBox, CategoryText } from '../../styles/categories';
+import { CategoriesScreenContainer, CategoryBox, CategoryText, HelpButton, HelpButtonText, StyledCategoriesContainer } from '../../styles/categories';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const backgroundImageAcciones: any = require('../../../assets/images/category-acciones.jpg');
+const backgroundImageGente: any = require('../../../assets/images/category-gente.jpg');
+const backgroundImageSalud: any = require('../../../assets/images/category-salud.jpg');
+const backgroundImageComida: any = require('../../../assets/images/category-comida.jpg');
+const backgroundImageVacio: any = require('../../../assets/images/category-vacio.jpg');
+
+const backgroundImages: Record<'Acciones' | 'Gente' | 'Salud' | 'Comida', any> = {
+  Acciones: backgroundImageAcciones,
+  Gente: backgroundImageGente,
+  Salud: backgroundImageSalud,
+  Comida: backgroundImageComida,
+}
 
 type CategoriesScreenNavProp = StackNavigationProp<RootStackParamList, 'Categories'>;
 
 const CategoriesScreen = () => {
   const navigation = useNavigation<CategoriesScreenNavProp>();
   const { categories, loading, error } = useCategories();
-  const { supportGroup } = useSupportGroup(); 
+  const { supportGroup } = useSupportGroup();
 
   const handleCategoryPress = (categoryId: string) => {
     navigation.navigate('Pictograms', { categoryId });
+  };
+
+  const handleHelpPress = () => {
+    console.log('AYUDA presionado');
   };
 
   useEffect(() => {
@@ -58,17 +75,28 @@ const CategoriesScreen = () => {
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 16 }}>
-          {`¡Hola, ${supportGroup.nombreAsistido}!`}
+          {supportGroup.nombreAsistido}
         </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {categories.map(category => (
-            <CategoryBox key={category.id}>
-              <TouchableOpacity onPress={() => handleCategoryPress(category.id)}>
+        <CategoriesScreenContainer>
+          <StyledCategoriesContainer>
+            {categories.map(category => (
+              <TouchableOpacity key={category.id} onPress={() => handleCategoryPress(category.id)}>
+                <CategoryBox>
+                  <ImageBackground
+                    source={(backgroundImages[category.nombre as keyof typeof backgroundImages]) ?? backgroundImageVacio}
+                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+                    imageStyle={{ borderRadius: 16 }}
+                  >
+                  </ImageBackground>
+                </CategoryBox>
                 <CategoryText>{category.nombre}</CategoryText>
               </TouchableOpacity>
-            </CategoryBox>
-          ))}
-        </View>
+            ))}
+          </StyledCategoriesContainer>
+          <HelpButton onPress={handleHelpPress}>
+            <HelpButtonText>AYUDA</HelpButtonText>
+          </HelpButton>
+        </CategoriesScreenContainer>
       </ScrollView>
     </SafeAreaView>
   );
