@@ -12,13 +12,19 @@ import SupportGroupEditScreen from '../screens/supportGroupUser/group/SupportGro
 import LinkScreen from '../screens/assistedUser/LinkScreen';
 import CategoriesScreen from '../screens/assistedUser/CategoriesScreen';
 import PictogramsScreen from '../screens/assistedUser/PictogramsScreen';
+import SendNotificationScreen from '../screens/assistedUser/SendNotificationScreen';
+import { IPictogram } from '../types/Pictogram';
 
 export type RootStackParamList = {
   Welcome: undefined;
   RoleSelection: undefined;
   Link: undefined;
   Categories: undefined;
-  Pictograms: { categoryId: string };
+  Pictograms: { categoryId: string, supportGroupId: string };
+  SendNotification: {
+    pictogram: IPictogram;
+    supportGroupId: string;
+  };
   Login: undefined;
   Register: undefined;
   SupportGroupMenu: undefined;
@@ -33,22 +39,23 @@ const Stack = createStackNavigator<RootStackParamList>()
 const AppNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Welcome" component={WelcomeScreen}/>
-      <Stack.Screen name="RoleSelection" component={RoleSelectionScreen}/>
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
+      <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
 
-      <Stack.Screen name="Link" component={LinkScreen}/>
-      <Stack.Screen name="Categories" component={CategoriesScreen}/>
-      <Stack.Screen name="Pictograms" component={PictogramsScreen}/>
+      <Stack.Screen name="Link" component={LinkScreen} />
+      <Stack.Screen name="Categories" component={CategoriesScreen} />
+      <Stack.Screen name="Pictograms" component={PictogramsScreen} />
+      <Stack.Screen name="SendNotification" component={SendNotificationScreen} />
 
-      <Stack.Screen name="Login" component={LoginScreen}/>
-      <Stack.Screen name="Register" component={RegisterScreen}/>
-      <Stack.Screen name="SupportGroupMenu" component={SupportGroupMenuScreen}/>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="SupportGroupMenu" component={SupportGroupMenuScreen} />
 
-      <Stack.Screen name="CreateGroup" component={CreateGroupScreen}/>
-      <Stack.Screen name="JoinGroup" component={JoinGroupScreen}/>
+      <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
+      <Stack.Screen name="JoinGroup" component={JoinGroupScreen} />
 
-      <Stack.Screen name="SupportGroupHome" component={SupportGroupHomeScreen}/>
-      <Stack.Screen name="SupportGroupEdit" component={SupportGroupEditScreen}/>
+      <Stack.Screen name="SupportGroupHome" component={SupportGroupHomeScreen} />
+      <Stack.Screen name="SupportGroupEdit" component={SupportGroupEditScreen} />
     </Stack.Navigator>
   )
 }

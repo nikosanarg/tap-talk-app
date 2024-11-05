@@ -29,7 +29,8 @@ const CategoriesScreen = () => {
   const { supportGroup } = useSupportGroup();
 
   const handleCategoryPress = (categoryId: string) => {
-    navigation.navigate('Pictograms', { categoryId });
+    if (!supportGroup) return
+    navigation.navigate('Pictograms', { categoryId, supportGroupId: supportGroup.id });
   };
 
   const handleHelpPress = () => {
