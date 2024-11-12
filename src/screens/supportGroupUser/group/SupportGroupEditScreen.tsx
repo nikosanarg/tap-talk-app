@@ -107,7 +107,6 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
     if (!supportGroup?.id) return;
 
     try {
-      // Eliminar la colección de notificaciones del grupo
       const notificationsSnapshot = await firestore()
         .collection('Notificaciones')
         .where('grupoId', '==', supportGroup.id)
@@ -119,7 +118,6 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
       });
       await batch.commit();
 
-      // Eliminar el grupo
       await firestore()
         .collection('Grupos')
         .doc(supportGroup.id)
@@ -127,8 +125,6 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
 
       Alert.alert("Grupo eliminado", `El grupo de ${supportGroup.nombreAsistido} ha sido eliminado.`);
       console.log(`🚮 Grupo ${supportGroup.id} eliminado.`);
-
-      // Actualizar el contexto y volver al menú
       setSupportGroup(null);
       navigation.navigate('SupportGroupMenu');
     } catch (error) {
@@ -154,7 +150,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
 
   return (
     <SafeAreaView>
-      <Header user={user} handleLogout={() => navigation.reset({ index: 0, routes: [{ name: 'RoleSelection' }] })} />
+      <Header />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <HeaderBoldTitle>Configuración de grupo</HeaderBoldTitle>

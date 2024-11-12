@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { TactileSelectionBox } from '../components/tactileOptionButton/TactileOptionButtonStyled';
 
 export const PictogramsScreenContainer = styled.View`
   flex-direction: column;
@@ -13,20 +14,17 @@ export const StyledPictogramsContainer = styled.View`
   gap: 12px;
 `;
 
-export const PictogramBox = styled.View`
+export const PictogramBox = styled(TactileSelectionBox)`
   width: 140px;
   height: 140px;
   background-color: #e0e0e0;
   margin: 8px;
-  border-radius: 16px;
-  overflow: hidden;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const PictogramText = styled.Text`
-  font-size: 16px;
+  font-size: 32px;
   color: #000;
   text-align: center;
-  margin-top: 8px;
+  margin-bottom: 20px;
+  margin-top: -12px;
 `;

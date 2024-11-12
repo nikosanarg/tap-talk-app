@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { TactileSelectionBox } from '../components/tactileOptionButton/TactileOptionButtonStyled';
 
 export const CategoriesScreenContainer = styled.View`
   flex-direction: column;
@@ -13,15 +14,11 @@ export const StyledCategoriesContainer = styled.View`
   gap: 12px;
 `;
 
-export const CategoryBox = styled.View`
+export const CategoryBox = styled(TactileSelectionBox)`
   width: 160px;
   height: 160px;
   background-color: #e0e0e0;
   margin: 8px;
-  border-radius: 16px;
-  overflow: hidden;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const CategoryText = styled.Text`

@@ -17,11 +17,12 @@ type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleS
 
 function RoleSelectionScreen(): React.JSX.Element {
   const navigation = useNavigation<RoleSelectionScreenNavProp>();
-  const { loading, error } = useCategories();
+  const { categories, fetchCategories, loading, error } = useCategories();
   const { setSupportGroup } = useSupportGroup(); 
 
   useEffect(() => {
     const checkGroupId = async () => {
+      if (categories.length === 0) await fetchCategories();
       const groupId = await AsyncStorage.getItem('groupId');
       if (groupId) {
         console.log(`🟢 Autenticación automática para el usuario asistido con groupId: ${groupId}`);

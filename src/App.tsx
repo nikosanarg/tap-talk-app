@@ -9,19 +9,19 @@ import { CategoriesProvider } from './contexts/CategoriesContext'
 
 function App(): React.JSX.Element {
   return (
-    <UserProvider>
-      <SupportGroupProvider>
-        <NotificationsProvider>
-          <CategoriesProvider>
-            <NavigationContainer>
+    <NavigationContainer>
+      <UserProvider>
+        <SupportGroupProvider>
+          <NotificationsProvider>
+            <CategoriesProvider>
               <SafeAreaView style={{ flex: 1 }}>
                 <AppNavigator />
               </SafeAreaView>
-            </NavigationContainer>
-          </CategoriesProvider>
-        </NotificationsProvider>
-      </SupportGroupProvider>
-    </UserProvider>
+            </CategoriesProvider>
+          </NotificationsProvider>
+        </SupportGroupProvider>
+      </UserProvider>
+    </NavigationContainer>
   )
 }
 

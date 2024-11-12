@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
 import ReturnButton from '../../components/returnButton/ReturnButton';
+import { IFirestoreUser } from '../../types/User';
 
 type LoginScreenNavProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -50,8 +51,19 @@ function LoginScreen(): React.JSX.Element {
         return
       }
       const userData = userDocument.data();
-      setUser({ uid: authenticatedUser.user.uid, ...userData });
-      console.log(`✅ Login exitoso para`, emailInput, authenticatedUser.user.uid);
+      const user: IFirestoreUser = {
+        uid: authenticatedUser.user.uid,
+        email: userData?.email,
+        nombre: userData?.nombre,
+        authProvider: userData?.authProvider,
+        rol: userData?.rol,
+        activo: userData?.activo,
+        fechaCreacion: userData?.fechaCreacion,
+        grupoIDs: userData?.grupoIDs ?? [],
+        pictogramasFavoritos: userData?.pictogramasFavoritos ?? []
+      }
+      setUser(user);
+      console.log(`✅ Login exitoso`, JSON.stringify(user));
       navigation.navigate('SupportGroupMenu');
     } catch (error: any) {
       console.log(`🚫 Login: Error | ${emailInput}`, error);
@@ -76,7 +88,7 @@ function LoginScreen(): React.JSX.Element {
             value={emailInput}
             onChangeText={setEmailInput}
             keyboardType="email-address"
-          />
+            />
           <StyledAuthTextInput
             value={passwordInput}
             onChangeText={setPasswordInput}

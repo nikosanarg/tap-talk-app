@@ -25,6 +25,7 @@ export const StyledAuthTextInput = styled(TextInput)`
   border-color: #D0B5D0;
   border-radius: 6px;
   font-size: 20px;
+  color: #000;
 `
 
 export const StyledContextualView = styled.View`

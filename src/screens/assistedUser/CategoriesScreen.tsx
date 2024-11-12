@@ -7,6 +7,7 @@ import { CategoriesScreenContainer, CategoryBox, CategoryText, HelpButton, HelpB
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AssistedUserHeader from '../../components/header/AssistedUserHeader';
 
 const backgroundImageAcciones: any = require('../../../assets/images/category-acciones.jpg');
 const backgroundImageGente: any = require('../../../assets/images/category-gente.jpg');
@@ -27,6 +28,8 @@ const CategoriesScreen = () => {
   const navigation = useNavigation<CategoriesScreenNavProp>();
   const { categories, loading, error } = useCategories();
   const { supportGroup } = useSupportGroup();
+
+  console.log('🙏 Categorías en CategoriesScreen:', categories);
 
   const handleCategoryPress = (categoryId: string) => {
     if (!supportGroup) return
@@ -75,9 +78,8 @@ const CategoriesScreen = () => {
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 16 }}>
-          {supportGroup.nombreAsistido}
-        </Text>
+        <AssistedUserHeader assistedUserName={supportGroup.nombreAsistido}/>
+
         <CategoriesScreenContainer>
           <StyledCategoriesContainer>
             {categories.map(category => (

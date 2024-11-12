@@ -53,17 +53,21 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     try {
       const notificationsCollection = firestore()
         .collection('Notificaciones')
-        .where('grupoId', '==', supportGroup.id);
-
+        .where('grupoId', '==', supportGroup.id)
+        .where('resuelta', '==', true);
       const notificationsSnapshot = await notificationsCollection.get();
-      notificationsSnapshot.forEach(doc => doc.ref.delete());
-      
-      setNotifications([]);
-      console.log("✅ Notificaciones eliminadas exitosamente para el grupo", supportGroup.id);
+      const batch = firestore().batch(); 
+      notificationsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      setNotifications(prev => prev.filter((notification: INotification) => !notification.fechaResuelta));
+      console.log("✅ Notificaciones resueltas eliminadas exitosamente para el grupo", supportGroup.id);
     } catch (error) {
-      console.error("🚫 Error al eliminar notificaciones:", error);
+      console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
+  
 
   return (
     <NotificationContext.Provider value={{ notifications, setNotifications, fetchNotifications, deleteAllNotifications }}>

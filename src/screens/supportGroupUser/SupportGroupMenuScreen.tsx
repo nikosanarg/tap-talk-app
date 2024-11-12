@@ -71,14 +71,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
       fetchGroups();
     }, [user?.uid, sortOption])
   );
-
-  const handleLogout = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'RoleSelection' }],
-    });
-  };
-
+  
   const handleJoinGroup = () => {
     navigation.navigate('JoinGroup');
   };
@@ -95,7 +88,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
 
   return (
     <SafeAreaView>
-      <Header user={user} handleLogout={handleLogout} />
+      <Header />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <StyledContextualView>

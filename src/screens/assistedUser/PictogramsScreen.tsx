@@ -63,11 +63,11 @@ function PictogramsScreen(): React.JSX.Element {
                 <PictogramBox>
                   <ImageBackground
                     source={{ uri: pictogram.icono ?? EMPTY_ICON_PLACEHOLDER }}
-                    style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+                    style={{ width: '100%', height: '100%' }}
                     imageStyle={{ borderRadius: 16 }}
                   />
-                  <PictogramText>{pictogram.nombre}</PictogramText>
                 </PictogramBox>
+                <PictogramText>{pictogram.nombre}</PictogramText>
               </TouchableOpacity>
             ))}
           </StyledPictogramsContainer>

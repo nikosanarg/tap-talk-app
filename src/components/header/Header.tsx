@@ -1,13 +1,10 @@
-import React from 'react'
-import { IFirestoreUser } from '../../types/User'
-import { HeaderText, LogoutActionButton, LogoutButtonText, SupportGroupHeaderContainer } from './headerStyled'
+import React from 'react';
+import { useUser } from '../../contexts/UserContext';
+import { HeaderText, LogoutActionButton, LogoutButtonText, SupportGroupHeaderContainer } from './headerStyled';
 
-interface HeaderProps {
-  user: IFirestoreUser | null
-  handleLogout: () => void
-}
+const Header = () => {
+  const { user, handleLogout } = useUser();
 
-const Header = ({ user, handleLogout }: HeaderProps) => { 
   return (
     <SupportGroupHeaderContainer>
       <HeaderText>{`¡Hola${user?.nombre ? `, ${user.nombre}` : ''}!`}</HeaderText>
@@ -15,7 +12,7 @@ const Header = ({ user, handleLogout }: HeaderProps) => {
         <LogoutButtonText>Cerrar sesión</LogoutButtonText>
       </LogoutActionButton>
     </SupportGroupHeaderContainer>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

@@ -18,6 +18,12 @@ export const HeaderText = styled.Text`
   text-align: center;
 `
 
+export const AssistedUserHeaderText = styled.Text`
+  font-size: 32px;
+  color: #65558F;
+  text-align: center;
+`
+
 export const LogoutActionButton = styled(ActionButton)`
   width: fit-content;
   background-color: rgb(255, 80, 100);

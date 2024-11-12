@@ -8,36 +8,29 @@ import { HeaderBoldTitle, HeaderSubTitle, SupportGroupListContainer } from '../.
 import { ActionButtonText, MenuActionButton } from '../../../styles/buttons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../../../components/header/Header';
-import { useNotifications } from '../../../contexts/NotificationContext';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
+import { useNotifications } from '../../../contexts/NotificationContext';
 import { useSupportGroup } from '../../../contexts/SupportGroupContext';
 import NotificationCard from '../../../components/notification/NotificationCard';
 import { InvitationHeader, NotificationsHeader } from '../../../components/notification/notificationStyled';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { INotification } from '../../../types/Notification';
 
 type SupportGroupHomeScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupHome'>;
 
 const SupportGroupHomeScreen = (): React.JSX.Element => {
-  const [isAdmin, setIsAdmin] = useState(false);
   const navigation = useNavigation<SupportGroupHomeScreenNavProp>();
   const { user } = useUser();
-  const { supportGroup } = useSupportGroup()
-  const { notifications, setNotifications } = useNotifications();
+  const { supportGroup } = useSupportGroup();
+  const { notifications, deleteAllNotifications } = useNotifications();
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const handleGoToMenu = () => {
-    setNotifications([])
     navigation.navigate('SupportGroupMenu');
   };
 
   const handleGoToEdit = () => {
     navigation.navigate('SupportGroupEdit');
-  };
-
-  const handleLogout = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'RoleSelection' }],
-    });
   };
 
   const handleCopyInvitationCode = () => {
@@ -55,10 +48,10 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
   return (
     <SafeAreaView>
-      <Header user={user} handleLogout={handleLogout} />
+      <Header />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <HeaderBoldTitle >Asistiendo a {supportGroup?.nombreAsistido || '...'}</HeaderBoldTitle>
+        <HeaderBoldTitle>Asistiendo a {supportGroup?.nombreAsistido || '...'}</HeaderBoldTitle>
         <InvitationHeader>
           <HeaderSubTitle>Copiar código de invitación</HeaderSubTitle>
           <TouchableOpacity onPress={handleCopyInvitationCode}>
@@ -74,14 +67,21 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
         <NotificationsHeader>
           <SupportText style={{ fontSize: 18 }}>Últimas notificaciones</SupportText>
+          <TouchableOpacity onPress={deleteAllNotifications}>
+            <Icon name="trash-bin" size={20} color="#9D6ACD" />
+          </TouchableOpacity>
         </NotificationsHeader>
 
         <SupportGroupListContainer>
           {notifications.length > 0 ? (
-            notifications.map(notification =>
-              <NotificationCard key={notification.id} notification={notification} />)
+            notifications.map((notification: INotification, index: number) =>
+              <NotificationCard
+                key={`${notification.titulo.replace(/\s+/g, '-')}-${index}`}
+                notification={notification}
+              />
+            )
           ) : (
-            <Text style={{ textAlign: 'center', marginTop: 10 }}>No hay notificaciones.</Text>
+            <Text style={{ textAlign: 'center', marginTop: 10 }}>No hay notificaciones</Text>
           )}
         </SupportGroupListContainer>
 

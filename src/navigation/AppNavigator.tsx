@@ -43,9 +43,19 @@ const AppNavigator = () => {
       <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
 
       <Stack.Screen name="Link" component={LinkScreen} />
-      <Stack.Screen name="Categories" component={CategoriesScreen} />
-      <Stack.Screen name="Pictograms" component={PictogramsScreen} />
-      <Stack.Screen name="SendNotification" component={SendNotificationScreen} />
+
+      <Stack.Screen name="Categories" component={CategoriesScreen} options={{
+        headerShown: false,
+        presentation: 'modal',
+      }} />
+      <Stack.Screen name="Pictograms" component={PictogramsScreen} options={{
+        headerShown: false,
+        presentation: 'modal',
+      }} />
+      <Stack.Screen name="SendNotification" component={SendNotificationScreen} options={{
+        headerShown: false,
+        presentation: 'modal',
+      }} />
 
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />

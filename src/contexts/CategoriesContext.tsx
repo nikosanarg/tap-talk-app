@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import firestore from '@react-native-firebase/firestore';
 
 interface ICategory {
@@ -13,38 +13,37 @@ interface CategoriesContextType {
   loading: boolean;
   error: string | null;
   setCategories: React.Dispatch<React.SetStateAction<ICategory[]>>;
+  fetchCategories: () => Promise<void>;
 }
 
 const CategoriesContext = createContext<CategoriesContextType | undefined>(undefined);
 
 export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const categorySnapshot = await firestore().collection('Categorías').where('activo', '==', true).get();
-        const fetchedCategories = categorySnapshot.docs.map(doc => ({
-          ...(doc.data() as ICategory),
-          id: doc.id,
-        }));
-        console.log('Categorías obtenidas:', fetchedCategories);
-        setCategories(fetchedCategories);
-      } catch (err) {
-        console.error('🚫 Error al obtener categorías:', err);
-        setError('Error al cargar las categorías. Intente nuevamente.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const fetchCategories = async () => {
+    console.log('🟢 Iniciando fetch a Categorías');
+    setLoading(true);
+    try {
+      const categorySnapshot = await firestore().collection('Categorías').where('activo', '==', true).get();
+      const fetchedCategories = categorySnapshot.docs.map(doc => ({
+        ...(doc.data() as ICategory),
+        id: doc.id,
+      }));
+      console.log('Categorías obtenidas:', fetchedCategories);
+      setCategories(fetchedCategories);
+    } catch (err) {
+      console.error('🚫 Error al obtener categorías:', err);
+      setError(`Error al cargar las categorías "${err}"`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <CategoriesContext.Provider value={{ categories, loading, error, setCategories }}>
+    <CategoriesContext.Provider value={{ categories, loading, error, setCategories, fetchCategories }}>
       {children}
     </CategoriesContext.Provider>
   );
