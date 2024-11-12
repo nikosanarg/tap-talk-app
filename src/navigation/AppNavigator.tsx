@@ -22,6 +22,7 @@ export type RootStackParamList = {
   Categories: undefined;
   Pictograms: { categoryId: string, supportGroupId: string };
   SendNotification: {
+    categoryName: string
     pictogram: IPictogram;
     supportGroupId: string;
   };

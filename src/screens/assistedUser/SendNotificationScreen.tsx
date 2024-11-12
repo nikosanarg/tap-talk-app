@@ -5,22 +5,16 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import firestore from '@react-native-firebase/firestore';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { NotificationBox, NotificationText } from '../../styles/assistUser';
-import { IPictogram } from '../../types/Pictogram';
-import { EMPTY_ICON_PLACEHOLDER, NOTIFICATION_STATE } from '../../utils/constants';
+import { EMPTY_ICON_PLACEHOLDER } from '../../utils/constants';
 import { INotification } from '../../types/Notification';
 
 type SendNotificationScreenRouteProp = RouteProp<RootStackParamList, 'SendNotification'>;
 type SendNotificationScreenNavProp = StackNavigationProp<RootStackParamList, 'SendNotification'>;
 
-interface NotificationProps {
-  pictogram: IPictogram;
-  supportGroupId: string;
-}
-
 function SendNotificationScreen(): React.JSX.Element {
   const route = useRoute<SendNotificationScreenRouteProp>();
   const navigation = useNavigation<SendNotificationScreenNavProp>();
-  const { pictogram, supportGroupId } = route.params;
+  const { categoryName, pictogram, supportGroupId } = route.params;
 
   const fadeAnim = new Animated.Value(0);
 
@@ -31,6 +25,7 @@ function SendNotificationScreen(): React.JSX.Element {
           grupoId: supportGroupId,
           pictogramaId: pictogram.id,
           titulo: pictogram.nombre,
+          categoria: categoryName,
           miembroResolutor: null,
           fechaCreacion: firestore.FieldValue.serverTimestamp(),
           fechaResuelta: null,

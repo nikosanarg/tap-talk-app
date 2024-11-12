@@ -3,6 +3,7 @@ import { IFirestoreUser } from '../types/User';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UserContextType {
   user: IFirestoreUser | null;
@@ -16,8 +17,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<IFirestoreUser | null>(null);
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setUser(null);
+    await AsyncStorage.removeItem('groupId');
     navigation.reset({
       index: 0,
       routes: [{ name: 'RoleSelection' }],

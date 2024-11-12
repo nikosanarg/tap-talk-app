@@ -8,6 +8,7 @@ interface NotificationContextType {
   setNotifications: React.Dispatch<React.SetStateAction<INotification[]>>;
   fetchNotifications: () => Promise<void>;
   deleteAllNotifications: () => Promise<void>;
+  deleteResolvedNotifications: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -49,7 +50,26 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
 
   const deleteAllNotifications = async () => {
     if (!supportGroup) return;
-    
+    try {
+      const notificationsCollection = firestore()
+        .collection('Notificaciones')
+        .where('grupoId', '==', supportGroup.id)
+      const notificationsSnapshot = await notificationsCollection.get();
+      const batch = firestore().batch(); 
+      notificationsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      setNotifications(prev => prev.filter((notification: INotification) => !notification.fechaResuelta));
+      console.log("✅ Notificaciones resueltas eliminadas exitosamente para el grupo", supportGroup.id);
+    } catch (error) {
+      console.error("🚫 Error al eliminar notificaciones resueltas:", error);
+    }
+  };
+
+
+  const deleteResolvedNotifications = async () => {
+    if (!supportGroup) return;
     try {
       const notificationsCollection = firestore()
         .collection('Notificaciones')
@@ -70,7 +90,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   
 
   return (
-    <NotificationContext.Provider value={{ notifications, setNotifications, fetchNotifications, deleteAllNotifications }}>
+    <NotificationContext.Provider value={{ notifications, setNotifications, fetchNotifications, deleteAllNotifications, deleteResolvedNotifications }}>
       {children}
     </NotificationContext.Provider>
   );

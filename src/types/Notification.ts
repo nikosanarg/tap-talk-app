@@ -4,6 +4,7 @@ export interface INotification {
   id?: string;
   grupoId: string;
   pictogramaId: string;
+  categoria: string;
   titulo: string;
   miembroResolutor: string | null;
   fechaCreacion: Timestamp | FieldValue;

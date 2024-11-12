@@ -21,10 +21,11 @@ function PictogramsScreen(): React.JSX.Element {
   const { categoryId, supportGroupId } = route.params;
   const [pictograms, setPictograms] = useState<IPictogram[]>([]);
   const [categoryColor, setCategoryColor] = useState<string>('#ffffff');
+  const [categoryName, setCategoryName] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCategoryColor = async () => {
+    const fetchCategoryData = async () => {
       try {
         const categoryDoc = await firestore().collection('Categorías').doc(categoryId).get();
         if (categoryDoc.exists) {
@@ -33,6 +34,7 @@ function PictogramsScreen(): React.JSX.Element {
           if (!categoryName) throw Error(`La categoría "${categoryName}" no existe`)
           if (!validateCategoryName(categoryName)) throw Error(`La categoría "${categoryName}" no es válida`)
           setPictograms(basicPictograms[categoryName]);
+          setCategoryName(categoryName);
           const color = getCategoryColor(categoryName);
           setCategoryColor(color);
         }
@@ -40,12 +42,14 @@ function PictogramsScreen(): React.JSX.Element {
         setErrorMessage(`Error en el flujo de carga de la categoría: ${error}`);
       }
     };
-    fetchCategoryColor();
+    fetchCategoryData();
   }, [categoryId]);
 
-  const handlePictogramPress = (pictogram: IPictogram, supportGroupId: string) => {
+  const handlePictogramPress = async (pictogram: IPictogram, supportGroupId: string) => {
     console.log(`🟢 Pictograma seleccionado: ${pictogram.id}`);
+    if (!categoryName) return
     navigation.navigate('SendNotification', {
+      categoryName,
       pictogram,
       supportGroupId
     });

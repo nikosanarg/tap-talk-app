@@ -19,7 +19,7 @@ export const NotificationsHeader = styled.View`
   margin: auto;
 `
 
-export const NotificationCardContainer = styled.View`
+export const NotificationCardContainer = styled.TouchableOpacity`
   display: flex;
   flex-direction: row;
   background-color: #FFF;
