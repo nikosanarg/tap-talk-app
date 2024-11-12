@@ -10,6 +10,7 @@ import { basicPictograms } from '../../mocks/pictograms.mock';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { validateCategoryName } from '../../utils/validateCategoryName';
 import { EMPTY_ICON_PLACEHOLDER } from '../../utils/constants';
+import { useCategories } from '../../contexts/CategoriesContext';
 
 type PictogramsScreenRouteProp = RouteProp<RootStackParamList, 'Pictograms'>;
 type PictogramsScreenNavProp = StackNavigationProp<RootStackParamList, 'Pictograms'>;
@@ -17,39 +18,24 @@ type PictogramsScreenNavProp = StackNavigationProp<RootStackParamList, 'Pictogra
 function PictogramsScreen(): React.JSX.Element {
   const route = useRoute<PictogramsScreenRouteProp>();
   const navigation = useNavigation<PictogramsScreenNavProp>();
+  const { selectedCategory } = useCategories()
 
-  const { categoryId, supportGroupId } = route.params;
+  const { supportGroupId } = route.params;
   const [pictograms, setPictograms] = useState<IPictogram[]>([]);
   const [categoryColor, setCategoryColor] = useState<string>('#ffffff');
-  const [categoryName, setCategoryName] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCategoryData = async () => {
-      try {
-        const categoryDoc = await firestore().collection('Categorías').doc(categoryId).get();
-        if (categoryDoc.exists) {
-          const categoryData = categoryDoc.data();
-          const categoryName = categoryData?.nombre
-          if (!categoryName) throw Error(`La categoría "${categoryName}" no existe`)
-          if (!validateCategoryName(categoryName)) throw Error(`La categoría "${categoryName}" no es válida`)
-          setPictograms(basicPictograms[categoryName]);
-          setCategoryName(categoryName);
-          const color = getCategoryColor(categoryName);
-          setCategoryColor(color);
-        }
-      } catch (error) {
-        setErrorMessage(`Error en el flujo de carga de la categoría: ${error}`);
-      }
-    };
-    fetchCategoryData();
-  }, [categoryId]);
+    if (!selectedCategory) throw Error(`La categoría "${selectedCategory}" no existe`)
+    if (!validateCategoryName(selectedCategory)) throw Error(`La categoría "${selectedCategory}" no es válida`)
+    setPictograms(basicPictograms[selectedCategory]);
+    const color = getCategoryColor(selectedCategory);
+    setCategoryColor(color);
+  }, [selectedCategory]);
 
   const handlePictogramPress = async (pictogram: IPictogram, supportGroupId: string) => {
     console.log(`🟢 Pictograma seleccionado: ${pictogram.id}`);
-    if (!categoryName) return
     navigation.navigate('SendNotification', {
-      categoryName,
       pictogram,
       supportGroupId
     });

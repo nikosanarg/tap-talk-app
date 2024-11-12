@@ -13,6 +13,8 @@ interface CategoriesContextType {
   loading: boolean;
   error: string | null;
   setCategories: React.Dispatch<React.SetStateAction<ICategory[]>>;
+  selectedCategory: string | null;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string | null>>;
   fetchCategories: () => Promise<void>;
 }
 
@@ -22,6 +24,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const fetchCategories = async () => {
     console.log('🟢 Iniciando fetch a Categorías');
@@ -43,7 +46,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CategoriesContext.Provider value={{ categories, loading, error, setCategories, fetchCategories }}>
+    <CategoriesContext.Provider value={{ categories, loading, error, setCategories, fetchCategories, selectedCategory, setSelectedCategory }}>
       {children}
     </CategoriesContext.Provider>
   );

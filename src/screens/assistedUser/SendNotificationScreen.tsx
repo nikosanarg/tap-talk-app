@@ -7,6 +7,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { NotificationBox, NotificationText } from '../../styles/assistUser';
 import { EMPTY_ICON_PLACEHOLDER } from '../../utils/constants';
 import { INotification } from '../../types/Notification';
+import { useCategories } from '../../contexts/CategoriesContext';
 
 type SendNotificationScreenRouteProp = RouteProp<RootStackParamList, 'SendNotification'>;
 type SendNotificationScreenNavProp = StackNavigationProp<RootStackParamList, 'SendNotification'>;
@@ -14,7 +15,8 @@ type SendNotificationScreenNavProp = StackNavigationProp<RootStackParamList, 'Se
 function SendNotificationScreen(): React.JSX.Element {
   const route = useRoute<SendNotificationScreenRouteProp>();
   const navigation = useNavigation<SendNotificationScreenNavProp>();
-  const { categoryName, pictogram, supportGroupId } = route.params;
+  const { pictogram, supportGroupId } = route.params;
+  const { selectedCategory } = useCategories()
 
   const fadeAnim = new Animated.Value(0);
 
@@ -25,7 +27,7 @@ function SendNotificationScreen(): React.JSX.Element {
           grupoId: supportGroupId,
           pictogramaId: pictogram.id,
           titulo: pictogram.nombre,
-          categoria: categoryName,
+          categoria: selectedCategory ?? 'N/A',
           miembroResolutor: null,
           fechaCreacion: firestore.FieldValue.serverTimestamp(),
           fechaResuelta: null,

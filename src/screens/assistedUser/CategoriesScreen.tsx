@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCategories } from '../../contexts/CategoriesContext';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
@@ -26,14 +26,15 @@ type CategoriesScreenNavProp = StackNavigationProp<RootStackParamList, 'Categori
 
 const CategoriesScreen = () => {
   const navigation = useNavigation<CategoriesScreenNavProp>();
-  const { categories, loading, error } = useCategories();
+  const { categories, loading, error, setSelectedCategory } = useCategories();
   const { supportGroup } = useSupportGroup();
 
   console.log('🙏 Categorías en CategoriesScreen:', categories);
 
-  const handleCategoryPress = (categoryId: string) => {
+  const handleCategoryPress = (categoryName: string) => {
     if (!supportGroup) return
-    navigation.navigate('Pictograms', { categoryId, supportGroupId: supportGroup.id });
+    setSelectedCategory( categoryName )
+    navigation.navigate('Pictograms', { supportGroupId: supportGroup.id });
   };
 
   const handleHelpPress = () => {
@@ -83,7 +84,7 @@ const CategoriesScreen = () => {
         <CategoriesScreenContainer>
           <StyledCategoriesContainer>
             {categories.map(category => (
-              <TouchableOpacity key={category.id} onPress={() => handleCategoryPress(category.id)}>
+              <TouchableOpacity key={category.id} onPress={() => handleCategoryPress(category.nombre)}>
                 <CategoryBox>
                   <ImageBackground
                     source={(backgroundImages[category.nombre as keyof typeof backgroundImages]) ?? backgroundImageVacio}

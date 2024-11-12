@@ -20,9 +20,8 @@ export type RootStackParamList = {
   RoleSelection: undefined;
   Link: undefined;
   Categories: undefined;
-  Pictograms: { categoryId: string, supportGroupId: string };
+  Pictograms: { supportGroupId: string };
   SendNotification: {
-    categoryName: string
     pictogram: IPictogram;
     supportGroupId: string;
   };

@@ -46,7 +46,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
   return (<>
     <NotificationCardContainer key={notification.id} onPress={handlePress}>
       <NotificationCategoryIcon style={{ backgroundColor: categoryColor }}>
-        <Text style={{ fontWeight: 'bold' }}>{notification?.titulo}</Text>
+        <Text style={{ fontWeight: 'bold' }}>{notification?.categoria}</Text>
       </NotificationCategoryIcon>
 
       <View style={{ flex: 1 }}>
