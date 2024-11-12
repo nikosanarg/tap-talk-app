@@ -22,7 +22,7 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupHomeScreenNavProp>();
   const { user } = useUser();
   const { supportGroup } = useSupportGroup();
-  const { notifications, deleteAllNotifications } = useNotifications();
+  const { notifications, deleteResolvedNotifications } = useNotifications();
   const [isAdmin, setIsAdmin] = useState(false)
 
   const handleGoToMenu = () => {
@@ -67,7 +67,7 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
         <NotificationsHeader>
           <SupportText style={{ fontSize: 18 }}>Últimas notificaciones</SupportText>
-          <TouchableOpacity onPress={deleteAllNotifications}>
+          <TouchableOpacity onPress={deleteResolvedNotifications}>
             <Icon name="trash-bin" size={20} color="#9D6ACD" />
           </TouchableOpacity>
         </NotificationsHeader>
