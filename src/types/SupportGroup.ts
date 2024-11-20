@@ -13,6 +13,5 @@ export interface IFirestoreSupportGroup {
 
 export interface IFirestoreSupportMember {
   id: string
-  nombre: string | null
-  fechaCreacion?: Timestamp
+  nombre: string
 }

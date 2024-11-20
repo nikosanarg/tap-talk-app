@@ -29,7 +29,7 @@ function LoginScreen(): React.JSX.Element {
           setEmailInput(storedEmail);
         }
       } catch (error) {
-        console.log('Error loading stored email:', error);
+        console.log('🚫 Error cargando el email almacenado asíncronamente:', error);
       }
     };
     loadStoredEmail();

@@ -23,36 +23,42 @@ function SendNotificationScreen(): React.JSX.Element {
   useEffect(() => {
     const sendNotification = async () => {
       try {
-        const newNotification: INotification = {
-          grupoId: supportGroupId,
-          pictogramaId: pictogram.id,
-          titulo: pictogram.nombre,
-          categoria: selectedCategory ?? 'N/A',
-          miembroResolutor: null,
-          fechaCreacion: firestore.FieldValue.serverTimestamp(),
-          fechaResuelta: null,
+        console.log(selectedCategory, supportGroupId)
+        if (!selectedCategory || !supportGroupId) 
+          throw Error(`Se perdió la categoría o el ID del grupo de soporte`)
+        else {
+          setTimeout(() => navigation.navigate('Categories'), 8000);
+          const newNotification: INotification = {
+            grupoId: supportGroupId,
+            pictogramaId: pictogram.id,
+            titulo: pictogram.nombre,
+            categoria: selectedCategory.nombre,
+            miembroResolutor: null,
+            fechaCreacion: firestore.FieldValue.serverTimestamp(),
+            fechaResuelta: null,
+          }
+          console.log('REQUEST', JSON.stringify(newNotification))
+          await firestore().collection('Notificaciones').add(newNotification);
+          console.log(`✅ Notificación enviada correctamente para el pictograma: ${pictogram.nombre}`);
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }).start();
         }
-        await firestore().collection('Notificaciones').add(newNotification);
-        console.log(`✅ Notificación enviada correctamente para el pictograma: ${pictogram.nombre}`);
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-        setTimeout(() => navigation.navigate('Categories'), 8000);
       } catch (error) {
         console.error("🚫 Error al enviar notificación:", error);
       }
     };
 
     sendNotification();
-  }, [pictogram, supportGroupId, navigation]);
+  }, [pictogram, supportGroupId, navigation, selectedCategory]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#37ff37', justifyContent: 'center', alignItems: 'center' }}>
       <NotificationBox>
         <ImageBackground
-          source={{ uri: pictogram.icono ?? EMPTY_ICON_PLACEHOLDER }}
+          source={{ uri: pictogram.imagenUrl ?? EMPTY_ICON_PLACEHOLDER }}
           style={{ width: '100%', height: '100%' }}
           imageStyle={{ borderRadius: 16 }}
         />

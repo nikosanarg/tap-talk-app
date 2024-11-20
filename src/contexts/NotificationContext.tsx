@@ -34,19 +34,18 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
         .where('grupoId', '==', supportGroup.id)
         .orderBy('fechaCreacion', 'desc')
         .get();
-        
+
       const fetchedNotifications = notificationsSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       })) as INotification[];
-        
+
       console.log(`📩 Notificaciones para el Grupo "${supportGroup.id}" (${fetchedNotifications.length})`);
       setNotifications(fetchedNotifications);
     } catch (error) {
       console.log("🚫 Error al obtener notificaciones:", error);
     }
   };
-  
 
   const deleteAllNotifications = async () => {
     if (!supportGroup) return;
@@ -55,7 +54,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
         .collection('Notificaciones')
         .where('grupoId', '==', supportGroup.id)
       const notificationsSnapshot = await notificationsCollection.get();
-      const batch = firestore().batch(); 
+      const batch = firestore().batch();
       notificationsSnapshot.forEach(doc => {
         batch.delete(doc.ref);
       });
@@ -66,7 +65,6 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
-
 
   const deleteResolvedNotifications = async () => {
     if (!supportGroup) return;
@@ -74,9 +72,9 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       const notificationsCollection = firestore()
         .collection('Notificaciones')
         .where('grupoId', '==', supportGroup.id)
-        .where('resuelta', '==', true);
+        .where('fechaResuelta', '!=', null);
       const notificationsSnapshot = await notificationsCollection.get();
-      const batch = firestore().batch(); 
+      const batch = firestore().batch();
       notificationsSnapshot.forEach(doc => {
         batch.delete(doc.ref);
       });
@@ -87,10 +85,15 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
-  
 
   return (
-    <NotificationContext.Provider value={{ notifications, setNotifications, fetchNotifications, deleteAllNotifications, deleteResolvedNotifications }}>
+    <NotificationContext.Provider value={{
+      notifications,
+      setNotifications,
+      fetchNotifications,
+      deleteAllNotifications,
+      deleteResolvedNotifications
+    }}>
       {children}
     </NotificationContext.Provider>
   );

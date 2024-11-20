@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTextInput, SupportTextAuthContainer, SupportText } from '../../styles/auth';
 import { ScreenView } from '../../styles/common';
-import firestore from '@react-native-firebase/firestore';
 import ReturnButton from '../../components/returnButton/ReturnButton';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
 import { IFirestoreSupportGroup } from '../../types/SupportGroup';
@@ -17,17 +16,13 @@ function LinkScreen(): React.JSX.Element {
   const navigation = useNavigation<LinkScreenNavProp>();
   const [linkCode, setLinkCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { supportGroup, setSupportGroup } = useSupportGroup()
+  const { setSupportGroup, fetchGroupByCode } = useSupportGroup()
 
   const handleLinkUser = async () => {
     const groupCode = linkCode;
     console.log(`🟢 Iniciando vinculación con el código: ${groupCode}`);
     try {
-      const groupSnapshot = await firestore()
-        .collection('Grupos')
-        .where('codigoInvitacion', '==', groupCode)
-        .get();
-  
+      const groupSnapshot = await fetchGroupByCode(groupCode)
       if (groupSnapshot.empty) {
         console.log(`🚫 Grupo no encontrado con el código: ${groupCode}`);
         setErrorMessage('🚫 No se encontró un grupo con ese código de vinculación');

@@ -1,52 +1,85 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import firestore from '@react-native-firebase/firestore';
-
-interface ICategory {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  activo: boolean;
-}
-
-interface CategoriesContextType {
-  categories: ICategory[];
-  loading: boolean;
-  error: string | null;
-  setCategories: React.Dispatch<React.SetStateAction<ICategory[]>>;
-  selectedCategory: string | null;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string | null>>;
-  fetchCategories: () => Promise<void>;
-}
+import { CategoriesContextType, ICategory } from '../types/Category';
+import { IPictogram } from '../types/Pictogram';
 
 const CategoriesContext = createContext<CategoriesContextType | undefined>(undefined);
 
 export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   const [categories, setCategories] = useState<ICategory[]>([]);
+  const [pictograms, setPictograms] = useState<Record<string, IPictogram[]>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null)
 
   const fetchCategories = async () => {
-    console.log('🟢 Iniciando fetch a Categorías');
+    console.log('🟢 Iniciando fetch de Categorías');
     setLoading(true);
     try {
       const categorySnapshot = await firestore().collection('Categorías').where('activo', '==', true).get();
+      console.log(categorySnapshot.docs[0].data())
       const fetchedCategories = categorySnapshot.docs.map(doc => ({
         ...(doc.data() as ICategory),
         id: doc.id,
       }));
-      console.log('Categorías obtenidas:', fetchedCategories);
       setCategories(fetchedCategories);
+      return fetchedCategories;
     } catch (err) {
       console.error('🚫 Error al obtener categorías:', err);
-      setError(`Error al cargar las categorías "${err}"`);
+      setError(`Error al cargar las categorías: ${err}`);
+      return []
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchAllPictograms = async ({ categories }: any): Promise<Record<string, IPictogram[]>> => {
+    console.log(`🟢 Iniciando fetch de Pictogramas para las ${categories?.length} Categorías`);
+    if (!categories || categories.length === 0) {
+      console.log('⚠️  No hay categorías cargadas para obtener pictogramas.');
+      return {};
+    }
+    setLoading(true);
+    try {
+      const pictogramsByCategory: Record<string, IPictogram[]> = {};
+      for (const category of categories) {
+        const pictogramsSnapshot = await firestore()
+          .collection('Categorías')
+          .doc(category.id)
+          .collection('Pictogramas')
+          .where('activo', '==', true)
+          .get();
+        const pictograms = pictogramsSnapshot.docs.map(doc => ({
+          ...(doc.data() as IPictogram),
+          id: doc.id,
+        }));
+        pictogramsByCategory[category.id] = pictograms;
+      }
+      setPictograms(pictogramsByCategory);
+      return pictogramsByCategory;
+    } catch (err) {
+      console.error('🚫 Error al obtener pictogramas:', err);
+      setError(`Error al cargar los pictogramas: ${err}`);
+      return {}; 
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
-    <CategoriesContext.Provider value={{ categories, loading, error, setCategories, fetchCategories, selectedCategory, setSelectedCategory }}>
+    <CategoriesContext.Provider
+      value={{
+        categories,
+        pictograms,
+        loading,
+        error,
+        fetchCategories,
+        fetchAllPictograms,
+        setCategories,
+        selectedCategory,
+        setSelectedCategory
+      }}
+    >
       {children}
     </CategoriesContext.Provider>
   );

@@ -42,6 +42,8 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
         ...doc.data(),
       })) as IFirestoreSupportGroup[];
 
+      console.log(fetchedGroups)
+
       const sortedGroups = sortGroups(fetchedGroups, sortOption);
       setGroups(sortedGroups);
       console.log("🎭 Grupos obtenidos correctamente y ordenados:", sortedGroups.map(sg => sg.nombreAsistido));

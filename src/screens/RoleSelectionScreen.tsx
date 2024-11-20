@@ -12,17 +12,18 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useCategories } from '../contexts/CategoriesContext';
 import { useSupportGroup } from '../contexts/SupportGroupContext';
 import { IFirestoreSupportGroup } from '../types/SupportGroup';
+import { ICategory } from '../types/Category';
 
 type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleSelection'>;
 
 function RoleSelectionScreen(): React.JSX.Element {
   const navigation = useNavigation<RoleSelectionScreenNavProp>();
-  const { categories, fetchCategories, loading, error } = useCategories();
+  const { categories, fetchCategories, pictograms, fetchAllPictograms, loading, error } = useCategories();
   const { setSupportGroup } = useSupportGroup(); 
 
   useEffect(() => {
     const checkGroupId = async () => {
-      if (categories.length === 0) await fetchCategories();
+      // if (categories.length === 0) await fetchCategories();
       const groupId = await AsyncStorage.getItem('groupId');
       if (groupId) {
         console.log(`🟢 Autenticación automática para el usuario asistido con groupId: ${groupId}`);
@@ -39,6 +40,7 @@ function RoleSelectionScreen(): React.JSX.Element {
             nombreAsistido: data?.nombreAsistido
           }
           setSupportGroup(groupData);
+          await initCategoriesAndPictograms();
           navigation.navigate('Categories');
         } else {
           console.error('🚫 Error: el grupo ya no existe');
@@ -48,6 +50,21 @@ function RoleSelectionScreen(): React.JSX.Element {
     };
     checkGroupId();
   }, [navigation]);
+  
+  const initCategoriesAndPictograms = async () => {
+    let fetchedCategories: any = categories
+    if (categories.length === 0) {
+      fetchedCategories = await fetchCategories();
+      console.log(`🟢🟢🟢 ${JSON.stringify(fetchedCategories)} 🟢🟢🟢`);
+    }
+    const hasPictograms = Object.keys(pictograms).length > 0 && 
+    fetchedCategories.every((category: ICategory) => pictograms[category.id]?.length > 0);
+    if (!hasPictograms) {
+      fetchAllPictograms({ categories: fetchedCategories });
+    } else {
+      console.log('✅ Pictogramas ya cargados:', pictograms);
+    }
+  };
 
   const handleClickRoleAssistedUser = () => {
     navigation.navigate('Link');

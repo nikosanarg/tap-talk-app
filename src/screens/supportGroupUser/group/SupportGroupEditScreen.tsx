@@ -2,22 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text, Alert, Button } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { useUser } from '../../../contexts/UserContext';
 import { StyledAuthTextInput, StyledContextualView, SupportText } from '../../../styles/auth';
 import { HeaderBoldTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
 import { ActionButtonText, DangerActionButton, MenuActionButton } from '../../../styles/buttons';
 import Header from '../../../components/header/Header';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useSupportGroup } from '../../../contexts/SupportGroupContext';
-import firestore from '@react-native-firebase/firestore';
 import AssistCard from '../../../components/AssistCard';
+import { useNotifications } from '../../../contexts/NotificationContext';
 
 type SupportGroupEditScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupEdit'>;
 
 const SupportGroupEditScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupEditScreenNavProp>();
-  const { user } = useUser();
-  const { supportGroup, setSupportGroup } = useSupportGroup();
+  const { supportGroup, setSupportGroup, fetchGroupMembers, deleteGroupById, updateGroupName, removeGroupMember } = useSupportGroup();
+  const { deleteAllNotifications } = useNotifications();
   const [members, setMembers] = useState<Array<{ id: string; nombre: string }>>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [groupName, setGroupName] = useState(supportGroup?.nombreAsistido || '');
@@ -33,18 +32,11 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
         setErrorMessage("No hay miembros en el grupo.");
         return;
       }
-
-      const usersSnapshot = await firestore()
-        .collection('Usuarios')
-        .where(firestore.FieldPath.documentId(), 'in', supportGroup.miembros)
-        .get();
-
+      const usersSnapshot = await fetchGroupMembers(supportGroup.miembros);
       const fetchedMembers = usersSnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data(),
-      })) as Array<{ id: string; nombre: string }>;
-
-      console.log("Miembros obtenidos:", fetchedMembers);
+        nombre: doc.data().nombre || '',
+      }));
       setMembers(fetchedMembers);
     } catch (error) {
       setErrorMessage("Hubo un problema buscando los miembros del grupo");
@@ -55,18 +47,11 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
   const handleRemoveMember = async (memberId: string) => {
     try {
       if (supportGroup?.id) {
-        await firestore()
-          .collection('Grupos')
-          .doc(supportGroup.id)
-          .update({
-            miembros: firestore.FieldValue.arrayRemove(memberId)
-          });
-
+        await removeGroupMember(supportGroup.id, memberId)
         setSupportGroup(prevGroup => ({
           ...prevGroup!,
           miembros: prevGroup!.miembros.filter(id => id !== memberId)
         }));
-
         setMembers(prevMembers => prevMembers.filter(member => member.id !== memberId));
         console.log(`🚮 Miembro ${memberId} eliminado del grupo.`);
       }
@@ -77,24 +62,20 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
   };
 
   const handleSaveGroupName = async () => {
+    if (!supportGroup) {
+      console.log("🚫 No hay un Grupo de apoyo almacenado en la caché:", supportGroup);
+      return
+    }
     if (!groupName.trim()) {
       Alert.alert("Error", "El nombre no puede estar vacío.");
       return;
     }
-
     try {
-      await firestore()
-        .collection('Grupos')
-        .doc(supportGroup?.id)
-        .update({
-          nombreAsistido: groupName
-        });
-
+      await updateGroupName(supportGroup?.id, groupName);
       setSupportGroup(prevGroup => ({
         ...prevGroup!,
         nombreAsistido: groupName
       }));
-
       Alert.alert("Éxito", "El nombre del usuario asistido ha sido actualizado.");
       console.log(`✅ Nombre del asistido actualizado a: ${groupName}`);
     } catch (error) {
@@ -102,26 +83,11 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
       setErrorMessage("Error al actualizar el nombre del usuario asistido.");
     }
   };
-
   const handleDeleteGroup = async () => {
     if (!supportGroup?.id) return;
-
     try {
-      const notificationsSnapshot = await firestore()
-        .collection('Notificaciones')
-        .where('grupoId', '==', supportGroup.id)
-        .get();
-
-      const batch = firestore().batch();
-      notificationsSnapshot.docs.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-      await batch.commit();
-
-      await firestore()
-        .collection('Grupos')
-        .doc(supportGroup.id)
-        .delete();
+      await deleteAllNotifications();
+      await deleteGroupById(supportGroup.id);
 
       Alert.alert("Grupo eliminado", `El grupo de ${supportGroup.nombreAsistido} ha sido eliminado.`);
       console.log(`🚮 Grupo ${supportGroup.id} eliminado.`);

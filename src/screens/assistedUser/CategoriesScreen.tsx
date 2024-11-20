@@ -8,6 +8,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AssistedUserHeader from '../../components/header/AssistedUserHeader';
+import { ICategory } from '../../types/Category';
 
 const backgroundImageAcciones: any = require('../../../assets/images/category-acciones.jpg');
 const backgroundImageGente: any = require('../../../assets/images/category-gente.jpg');
@@ -28,12 +29,11 @@ const CategoriesScreen = () => {
   const navigation = useNavigation<CategoriesScreenNavProp>();
   const { categories, loading, error, setSelectedCategory } = useCategories();
   const { supportGroup } = useSupportGroup();
+  console.log(`🙏 Categorías en CategoriesScreen: ${categories?.map(c => c.nombre)}`);
 
-  console.log('🙏 Categorías en CategoriesScreen:', categories);
-
-  const handleCategoryPress = (categoryName: string) => {
+  const handleCategoryPress = (category: ICategory) => {
     if (!supportGroup) return
-    setSelectedCategory( categoryName )
+    setSelectedCategory( category )
     navigation.navigate('Pictograms', { supportGroupId: supportGroup.id });
   };
 
@@ -84,7 +84,7 @@ const CategoriesScreen = () => {
         <CategoriesScreenContainer>
           <StyledCategoriesContainer>
             {categories.map(category => (
-              <TouchableOpacity key={category.id} onPress={() => handleCategoryPress(category.nombre)}>
+              <TouchableOpacity key={category.id} onPress={() => handleCategoryPress(category)}>
                 <CategoryBox>
                   <ImageBackground
                     source={(backgroundImages[category.nombre as keyof typeof backgroundImages]) ?? backgroundImageVacio}
