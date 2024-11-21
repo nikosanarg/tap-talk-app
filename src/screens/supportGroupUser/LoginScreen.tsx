@@ -11,6 +11,7 @@ import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
 import ReturnButton from '../../components/returnButton/ReturnButton';
 import { IFirestoreUser } from '../../types/User';
+import messaging from '@react-native-firebase/messaging';
 
 type LoginScreenNavProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -34,6 +35,19 @@ function LoginScreen(): React.JSX.Element {
     };
     loadStoredEmail();
   }, []);
+
+  const requestNotificationPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      console.log('🟢 Permiso para notificaciones otorgado:', authStatus);
+    } else {
+      console.warn('⚠️ Permiso para notificaciones denegado');
+    }
+  };
 
   const handleLoginFirebase = async () => {
     try {
@@ -64,6 +78,15 @@ function LoginScreen(): React.JSX.Element {
       }
       setUser(user);
       console.log(`✅ Login exitoso`, JSON.stringify(user));
+
+      const deviceToken = await messaging().getToken();
+      console.log('📲 Device token obtenido:', deviceToken);
+      await firestore().collection('Usuarios').doc(authenticatedUser.user.uid).update({
+        deviceToken,
+      });
+      console.log('✅ Token del dispositivo registrado en Firestore');
+      requestNotificationPermission();
+
       navigation.navigate('SupportGroupMenu');
     } catch (error: any) {
       console.log(`🚫 Login: Error | ${emailInput}`, error);

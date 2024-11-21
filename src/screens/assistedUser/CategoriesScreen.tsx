@@ -38,7 +38,7 @@ const CategoriesScreen = () => {
   };
 
   const handleHelpPress = () => {
-    console.log('AYUDA presionado');
+    console.log('🔴 AYUDA presionado');
   };
 
   useEffect(() => {

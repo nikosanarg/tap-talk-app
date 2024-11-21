@@ -55,7 +55,6 @@ function RoleSelectionScreen(): React.JSX.Element {
     let fetchedCategories: any = categories
     if (categories.length === 0) {
       fetchedCategories = await fetchCategories();
-      console.log(`🟢🟢🟢 ${JSON.stringify(fetchedCategories)} 🟢🟢🟢`);
     }
     const hasPictograms = Object.keys(pictograms).length > 0 && 
     fetchedCategories.every((category: ICategory) => pictograms[category.id]?.length > 0);

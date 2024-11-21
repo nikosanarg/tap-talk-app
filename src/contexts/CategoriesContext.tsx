@@ -17,7 +17,6 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const categorySnapshot = await firestore().collection('Categorías').where('activo', '==', true).get();
-      console.log(categorySnapshot.docs[0].data())
       const fetchedCategories = categorySnapshot.docs.map(doc => ({
         ...(doc.data() as ICategory),
         id: doc.id,
