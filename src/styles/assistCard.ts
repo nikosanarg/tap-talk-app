@@ -2,8 +2,8 @@ import styled from "styled-components/native";
 import { ActionButton } from "./buttons";
 
 export const GroupCard = styled.TouchableOpacity`
-  background-color: #F5F5FF;
-  border: 1px solid #888;
+  background-color: #FFF;
+  border: 1px solid #BBB;
   padding: 0px 16px 0px 32px;
   margin: 2px 4px;
   width: 98%;

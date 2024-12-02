@@ -5,7 +5,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import firestore from '@react-native-firebase/firestore';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { NotificationBox, NotificationText } from '../../styles/assistUser';
-import { EMPTY_ICON_PLACEHOLDER } from '../../utils/constants';
+import { EMPTY_ICON_PLACEHOLDER, FIREBASE_CLOUD_MESSAGING_ID } from '../../utils/constants';
 import { useCategories } from '../../contexts/CategoriesContext';
 
 type SendNotificationScreenRouteProp = RouteProp<RootStackParamList, 'SendNotification'>;
@@ -20,8 +20,11 @@ function SendNotificationScreen(): React.JSX.Element {
   const fadeAnim = new Animated.Value(0);
 
   useEffect(() => {
-    const sendNotificationsToGroup = async (supportGroupId: string, notificationPayload: any) => {
+    const sendNotification = async () => {
       try {
+        if (!selectedCategory || !supportGroupId) 
+          throw new Error('Faltan datos para enviar la notificación');
+    
         const groupDoc = await firestore().collection('Grupos').doc(supportGroupId).get();
         if (!groupDoc.exists) {
           throw new Error(`El grupo con ID ${supportGroupId} no existe`);
@@ -31,7 +34,7 @@ function SendNotificationScreen(): React.JSX.Element {
         const memberIds = groupData?.miembros || [];
         
         if (memberIds.length === 0) {
-          console.warn('⚠️ El grupo no tiene miembros para notificar');
+          console.log('⚠️ El grupo no tiene miembros para notificar');
           return;
         }
     
@@ -44,43 +47,25 @@ function SendNotificationScreen(): React.JSX.Element {
               tokens.push(userData.deviceToken);
             }
           }
-        }
-    
+        }    
         if (tokens.length === 0) {
-          console.warn('⚠️ No se encontraron tokens para enviar notificaciones');
+          console.log('⚠️ No se encontraron tokens para enviar notificaciones');
           return;
         }
     
-        for (const token of tokens) {
-          await firestore().collection('Notificaciones').add({
-            token,
-            ...notificationPayload,
-            fechaEnvio: firestore.FieldValue.serverTimestamp(),
-          });
-          console.log(`✅ Notificación enviada a token: ${token}`);
-        }
-      } catch (error) {
-        console.error('🚫 Error al enviar notificaciones:', error);
-      }
-    };
-
-    const sendNotification = async () => {
-      try {
-        if (!selectedCategory || !supportGroupId) 
-          throw new Error('Faltan datos para enviar la notificación');
-  
         const notificationPayload = {
           grupoId: supportGroupId,
           pictogramaId: pictogram.id,
           titulo: pictogram.nombre,
           categoria: selectedCategory.nombre,
+          tokens,
           miembroResolutor: null,
           fechaCreacion: firestore.FieldValue.serverTimestamp(),
           fechaResuelta: null,
         };
-  
-        await sendNotificationsToGroup(supportGroupId, notificationPayload);
-        console.log(`✅ Notificación enviada correctamente para el pictograma: ${pictogram.nombre}`);
+    
+        await firestore().collection('Notificaciones').add(notificationPayload);
+        console.log(`✅ Notificación guardada correctamente para el pictograma: ${pictogram.nombre}`);
         
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -89,13 +74,35 @@ function SendNotificationScreen(): React.JSX.Element {
         }).start();
   
         setTimeout(() => navigation.navigate('Categories'), 8000);
+    
+        for (const token of tokens) {
+          await fetch('https://fcm.googleapis.com/fcm/send', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `key=${FIREBASE_CLOUD_MESSAGING_ID}`,
+            },
+            body: JSON.stringify({
+              to: token,
+              notification: {
+                title: `Nueva solicitud en "${selectedCategory.nombre}"`,
+                body: `Asistido requiere: ${pictogram.nombre}`,
+              },
+              data: {
+                grupoId: supportGroupId,
+                pictogramaId: pictogram.id,
+              },
+            }),
+          });
+          console.log(`✅ Notificación enviada a token: ${token}`);
+        }
       } catch (error) {
         console.error("🚫 Error al enviar notificación:", error);
       }
-    }; 
+    };    
 
     sendNotification();
-  }, [pictogram, supportGroupId, navigation, selectedCategory]);
+  }, [pictogram]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#37ff37', justifyContent: 'center', alignItems: 'center' }}>
