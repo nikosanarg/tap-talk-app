@@ -74,6 +74,7 @@ function JoinGroupScreen(): React.JSX.Element {
           
           <StyledAuthTextInput
             placeholder="Código de invitación"
+            placeholderTextColor="#88B"
             value={invitationCode}
             onChangeText={setInvitationCode}
           />

@@ -52,6 +52,7 @@ function LinkScreen(): React.JSX.Element {
           
           <StyledAuthTextInput
             placeholder="Código de vinculación"
+            placeholderTextColor="#88B"
             value={linkCode}
             onChangeText={setLinkCode}
           />

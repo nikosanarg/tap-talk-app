@@ -60,6 +60,7 @@ function CreateGroupScreen(): React.JSX.Element {
           
           <StyledAuthTextInput
             placeholder="Nombre del usuario asistido"
+            placeholderTextColor="#88B"
             value={assistedUserName}
             onChangeText={setAssistedUserName}
           />

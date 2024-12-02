@@ -61,23 +61,27 @@ function RegisterScreen(): React.JSX.Element {
           </SupportTextAuthContainer>
           <StyledAuthTextInput
             placeholder="Tu nombre"
+            placeholderTextColor="#88B"
             value={usernameInput}
             onChangeText={setUsernameInput}
           />
           <StyledAuthTextInput
             placeholder="Correo electrónico"
+            placeholderTextColor="#88B"
             value={emailInput}
             onChangeText={setEmailInput}
             keyboardType="email-address"
           />
           <StyledAuthTextInput
             placeholder="Contraseña"
+            placeholderTextColor="#88B"
             value={passwordInput}
             onChangeText={setPasswordInput}
             secureTextEntry
           />
           <StyledAuthTextInput
             placeholder="Confirmar contraseña"
+            placeholderTextColor="#88B"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry

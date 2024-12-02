@@ -125,6 +125,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
           <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Nombre del usuario asistido</SupportText>
           <StyledAuthTextInput
             placeholder="Nuevo nombre"
+            placeholderTextColor="#88B"
             value={groupName}
             onChangeText={setGroupName}
           />

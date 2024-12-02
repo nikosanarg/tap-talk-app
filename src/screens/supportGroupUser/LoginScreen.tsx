@@ -107,15 +107,17 @@ function LoginScreen(): React.JSX.Element {
           </SupportTextAuthContainer>
 
           <StyledAuthTextInput
-            placeholder="Correo electrónico"
             value={emailInput}
             onChangeText={setEmailInput}
             keyboardType="email-address"
+            placeholder="Correo electrónico"
+            placeholderTextColor="#88B"
             />
           <StyledAuthTextInput
             value={passwordInput}
             onChangeText={setPasswordInput}
             placeholder="Contraseña"
+            placeholderTextColor="#88B"
             secureTextEntry
           />
 
