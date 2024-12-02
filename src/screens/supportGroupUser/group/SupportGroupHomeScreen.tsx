@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView, ScrollView, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../../../contexts/UserContext';
-import { StyledContextualView, SupportText } from '../../../styles/auth';
-import { HeaderBoldTitle, HeaderSubTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
+import { StyledContextualView } from '../../../styles/auth';
+import { HeaderBoldTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
 import { ActionButtonText, MenuActionButton } from '../../../styles/buttons';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../../../components/header/Header';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
 import { useNotifications } from '../../../contexts/NotificationContext';
 import { useSupportGroup } from '../../../contexts/SupportGroupContext';
 import NotificationCard from '../../../components/notification/NotificationCard';
-import { InvitationHeader, NotificationsHeader } from '../../../components/notification/notificationStyled';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { INotification } from '../../../types/Notification';
+import TouchableMenuButton from '../../../components/touchableScreenButton';
+import { TouchableMenu } from '../../../styles/touchableMenu';
 
 type SupportGroupHomeScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupHome'>;
 
@@ -52,25 +52,12 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <HeaderBoldTitle>Asistiendo a {supportGroup?.nombreAsistido || '...'}</HeaderBoldTitle>
-        <InvitationHeader>
-          <HeaderSubTitle>Copiar código de invitación</HeaderSubTitle>
-          <TouchableOpacity onPress={handleCopyInvitationCode}>
-            <Icon name="copy" size={20} color="#9D6ACD" />
-          </TouchableOpacity>
-        </InvitationHeader>
 
-        <StyledContextualView>
-          <MenuActionButton style={{ backgroundColor: isAdmin ? '#65558F' : '#AAA' }} onPress={handleGoToEdit} disabled={!isAdmin}>
-            <ActionButtonText>Modificar grupo y miembros</ActionButtonText>
-          </MenuActionButton>
-        </StyledContextualView>
-
-        <NotificationsHeader>
-          <SupportText style={{ fontSize: 18 }}>Últimas notificaciones</SupportText>
-          <TouchableOpacity onPress={deleteResolvedNotifications}>
-            <Icon name="trash-bin" size={20} color="#9D6ACD" />
-          </TouchableOpacity>
-        </NotificationsHeader>
+        <TouchableMenu>
+          <TouchableMenuButton title='Modificar grupo y miembros' iconName="settings" onPress={handleGoToEdit} disabled={!isAdmin} />
+          <TouchableMenuButton title='Copiar código de invitación' iconName="copy" onPress={handleCopyInvitationCode} />
+          <TouchableMenuButton title='Borrar notificaciones resueltas' iconName="trash-bin" onPress={deleteResolvedNotifications} />
+        </TouchableMenu>
 
         <SupportGroupListContainer>
           {notifications.length > 0 ? (

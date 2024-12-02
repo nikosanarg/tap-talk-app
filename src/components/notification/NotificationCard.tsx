@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Modal, Text, TouchableOpacity, View } from 'react-native'
 import { INotification } from '../../types/Notification'
 import Icon from 'react-native-vector-icons/Ionicons';
-import { NotificationCardContainer, NotificationCategoryIcon } from './notificationStyled';
+import { NotificationCardContainer, NotificationCategoryIcon, NotificationCategoryLabel, NotificationCategorySubtitle, NotificationCategoryTitle } from './styled';
 import { formatSinceTimeToHumanRead } from '../../utils/formatHour';
 import { getCategoryColor } from '../../utils/getCategoryColor';
 import firestore from '@react-native-firebase/firestore';
@@ -46,16 +46,16 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
   return (<>
     <NotificationCardContainer key={notification.id} onPress={handlePress}>
       <NotificationCategoryIcon style={{ backgroundColor: categoryColor }}>
-        <Text style={{ fontWeight: 'bold' }}>{notification?.categoria}</Text>
+        <NotificationCategoryLabel>{notification?.categoria}</NotificationCategoryLabel>
       </NotificationCategoryIcon>
 
       <View style={{ flex: 1 }}>
-        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{notification.titulo}</Text>
-        <Text style={{ fontSize: 13 }}>
+        <NotificationCategoryTitle>{notification.titulo}</NotificationCategoryTitle>
+        <NotificationCategorySubtitle>
           {notification.fechaCreacion instanceof firestore.Timestamp
             ? formatSinceTimeToHumanRead(notification.fechaCreacion)
             : 'Fecha desconocida'}
-        </Text>
+        </NotificationCategorySubtitle>
       </View>
 
       {notification.miembroResolutor ? (

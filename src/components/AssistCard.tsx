@@ -15,7 +15,7 @@ const AssistCard = ({ group, member, callback }: IAssistCardProps) => {
   const { supportGroup } = useSupportGroup()
 
   return (
-    <GroupCard>
+    <GroupCard onPress={callback}>
       <GroupTextContainer>
         <GroupTitle>👤 {group?.nombreAsistido ?? member?.nombre}</GroupTitle>
       </GroupTextContainer>
