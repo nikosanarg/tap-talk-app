@@ -4,7 +4,7 @@ import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firest
 
 interface SupportGroupContextType {
   supportGroup: IFirestoreSupportGroup | null;
-  fetchGroupByCode: (groupCode: string) => Promise<FirebaseFirestoreTypes.QuerySnapshot>;
+  fetchGroupByCode: (groupCode: string) => Promise<IFirestoreSupportGroup | null>;
   fetchGroupMembers: (memberIds: string[]) => Promise<FirebaseFirestoreTypes.QuerySnapshot>;
   setSupportGroup: React.Dispatch<React.SetStateAction<IFirestoreSupportGroup | null>>;
   deleteGroupById: (groupId: string) => Promise<void>;
@@ -17,12 +17,23 @@ const SupportGroupContext = createContext<SupportGroupContextType | undefined>(u
 export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
   const [supportGroup, setSupportGroup] = useState<IFirestoreSupportGroup | null>(null);
 
-  const fetchGroupByCode = async (groupCode: string): Promise<FirebaseFirestoreTypes.QuerySnapshot> => {
+  const fetchGroupByCode = async (groupCode: string): Promise<IFirestoreSupportGroup | null> => {
     try {
-      return await firestore()
+      const snapshot = await firestore()
         .collection('Grupos')
         .where('codigoInvitacion', '==', groupCode)
         .get();
+
+      if (snapshot.empty) {
+        console.log("🌵 No se encontró el grupo.");
+        return null;
+      }
+      const doc = snapshot.docs[0];
+      const groupData = doc.data() as Omit<IFirestoreSupportGroup, 'id'>;
+      const groupWithId: IFirestoreSupportGroup = { id: doc.id, ...groupData };
+
+      setSupportGroup(groupWithId);
+      return groupWithId;
     } catch (error) {
       console.error(`🚫 Error al buscar el grupo con el código ${groupCode}:`, error);
       throw new Error('Error al obtener el grupo. Por favor, inténtelo de nuevo.');
@@ -44,7 +55,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Hubo un problema buscando los miembros del grupo.");
     }
   };
-  
+
   const deleteGroupById = async (groupId: string): Promise<void> => {
     try {
       await firestore().collection('Grupos').doc(groupId).delete();
@@ -54,7 +65,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Error al intentar eliminar el grupo de apoyo.");
     }
   };
-  
+
   const updateGroupName = async (groupId: string, newName: string): Promise<void> => {
     try {
       await firestore().collection('Grupos').doc(groupId).update({ nombreAsistido: newName });
@@ -64,7 +75,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Error al actualizar el nombre del usuario asistido.");
     }
   };
-  
+
   const removeGroupMember = async (groupId: string, memberId: string): Promise<void> => {
     try {
       await firestore().collection('Grupos').doc(groupId).update({
@@ -76,16 +87,19 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Error al eliminar el miembro del grupo.");
     }
   };
+
   return (
-    <SupportGroupContext.Provider value={{
-      supportGroup,
-      fetchGroupByCode,
-      fetchGroupMembers,
-      setSupportGroup,
-      deleteGroupById,
-      updateGroupName,
-      removeGroupMember
-    }}>
+    <SupportGroupContext.Provider
+      value={{
+        supportGroup,
+        fetchGroupByCode,
+        fetchGroupMembers,
+        setSupportGroup,
+        deleteGroupById,
+        updateGroupName,
+        removeGroupMember,
+      }}
+    >
       {children}
     </SupportGroupContext.Provider>
   );

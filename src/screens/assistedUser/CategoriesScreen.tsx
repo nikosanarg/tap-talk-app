@@ -27,7 +27,7 @@ type CategoriesScreenNavProp = StackNavigationProp<RootStackParamList, 'Categori
 
 const CategoriesScreen = () => {
   const navigation = useNavigation<CategoriesScreenNavProp>();
-  const { categories, loading, error, setSelectedCategory } = useCategories();
+  const { categories, loading, error, setSelectedCategory, fetchCategories } = useCategories();
   const { supportGroup } = useSupportGroup();
   console.log(`🙏 Categorías en CategoriesScreen: ${categories?.map(c => c.nombre)}`);
 
@@ -49,6 +49,12 @@ const CategoriesScreen = () => {
       removeGroupId();
     }
   }, [supportGroup]);
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      fetchCategories();
+    }
+  }, [categories]);
 
   if (loading) {
     return (

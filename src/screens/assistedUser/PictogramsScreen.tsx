@@ -35,7 +35,7 @@ function PictogramsScreen(): React.JSX.Element {
   }, [selectedCategory, pictograms]);
 
   const handlePictogramPress = (pictogram: IPictogram) => {
-    console.log(`🟢 Pictograma seleccionado: ${pictogram.nombre} (ID ${pictogram.id})`);
+    console.log(`🟢 Pictograma seleccionado: ${pictogram.nombre} (ID ${pictogram.id}) para grupo ${supportGroupId}`);
     navigation.navigate('SendNotification', {
       pictogram,
       supportGroupId,
