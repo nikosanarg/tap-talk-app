@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import { useSupportGroup } from './SupportGroupContext';
 import { INotification } from '../types/Notification';
@@ -6,9 +6,9 @@ import { INotification } from '../types/Notification';
 interface NotificationContextType {
   notifications: INotification[];
   setNotifications: React.Dispatch<React.SetStateAction<INotification[]>>;
-  fetchNotifications: () => Promise<void>;
   deleteAllNotifications: () => Promise<void>;
   deleteResolvedNotifications: () => Promise<void>;
+  fromSnapshot: React.MutableRefObject<boolean>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -16,17 +16,12 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationsProvider = ({ children }: { children: ReactNode }) => {
   const { supportGroup } = useSupportGroup();
   const [notifications, setNotifications] = useState<INotification[]>([]);
-
-  useEffect(() => {
-    if (supportGroup?.id) {
-      fetchNotifications();
-    }
-  }, [supportGroup]);
+  const fromSnapshot = useRef(false);
 
   const fetchNotifications = async () => {
     if (!supportGroup) {
       console.log("🚫 No hay un Grupo de apoyo almacenado en la caché:", supportGroup);
-      return
+      return;
     }
     try {
       const notificationsSnapshot = await firestore()
@@ -40,64 +35,83 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
         ...doc.data(),
       })) as INotification[];
 
-      console.log(`📩 Notificaciones para el Grupo "${supportGroup.id}" (${fetchedNotifications.length})`);
+      console.log(`📩 Notificaciones descargadas para el grupo "${supportGroup.id}"`);
       setNotifications(fetchedNotifications);
     } catch (error) {
-      console.log("🚫 Error al obtener notificaciones:", error);
+      console.error("🚫 Error al obtener notificaciones:", error);
     }
   };
 
+  useEffect(() => {
+    if (!supportGroup?.id) return;
+
+    fetchNotifications(); // ✅ Carga inicial
+
+    const unsubscribe = firestore()
+      .collection('Notificaciones')
+      .where('grupoId', '==', supportGroup.id)
+      .orderBy('fechaCreacion', 'desc')
+      .onSnapshot(snapshot => {
+        fromSnapshot.current = true; // 🔥 Cambios en vivo vienen del snapshot
+        const fetchedNotifications = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as INotification[];
+
+        console.log(`🔔 Notificaciones actualizadas para el grupo "${supportGroup.id}"`);
+        setNotifications(fetchedNotifications);
+      }, error => {
+        console.error("🚫 Error en la suscripción de notificaciones:", error);
+      });
+
+    return () => unsubscribe();
+  }, [supportGroup?.id]);
+
   const deleteAllNotifications = async () => {
+    fromSnapshot.current = false;
     if (!supportGroup) return;
     try {
-      const notificationsCollection = firestore()
+      const notificationsSnapshot = await firestore()
         .collection('Notificaciones')
         .where('grupoId', '==', supportGroup.id)
-      const notificationsSnapshot = await notificationsCollection.get();
+        .get();
+
       const batch = firestore().batch();
       notificationsSnapshot.forEach(doc => {
         batch.delete(doc.ref);
       });
+
       await batch.commit();
-      setNotifications(prev => prev.filter((notification: INotification) => !notification.fechaResuelta));
-      console.log("✅ Notificaciones resueltas eliminadas exitosamente para el grupo", supportGroup.id);
-      await fetchNotifications();
-      console.log("✅ Descarga de la imagen actualizada de notificaciones para el grupo", supportGroup.id);
+      console.log("✅ Todas las notificaciones eliminadas.");
     } catch (error) {
-      console.error("🚫 Error al eliminar notificaciones resueltas:", error);
+      console.error("🚫 Error al eliminar notificaciones:", error);
     }
   };
 
   const deleteResolvedNotifications = async () => {
+    fromSnapshot.current = false;
     if (!supportGroup) return;
     try {
-      const notificationsCollection = firestore()
+      const notificationsSnapshot = await firestore()
         .collection('Notificaciones')
         .where('grupoId', '==', supportGroup.id)
-        .where('fechaResuelta', '!=', null);
-      const notificationsSnapshot = await notificationsCollection.get();
+        .where('fechaResuelta', '!=', null)
+        .get();
+
       const batch = firestore().batch();
       notificationsSnapshot.forEach(doc => {
         batch.delete(doc.ref);
       });
+
       await batch.commit();
-      setNotifications(prev => prev.filter((notification: INotification) => !notification.fechaResuelta));
-      console.log("✅ Notificaciones resueltas eliminadas exitosamente para el grupo", supportGroup.id);
-      await fetchNotifications();
-      console.log("✅ Descarga de la imagen actualizada de notificaciones para el grupo", supportGroup.id);
+      console.log("✅ Notificaciones resueltas eliminadas.");
     } catch (error) {
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
 
   return (
-    <NotificationContext.Provider value={{
-      notifications,
-      setNotifications,
-      fetchNotifications,
-      deleteAllNotifications,
-      deleteResolvedNotifications
-    }}>
+    <NotificationContext.Provider value={{ notifications, setNotifications, deleteAllNotifications, deleteResolvedNotifications, fromSnapshot }}>
       {children}
     </NotificationContext.Provider>
   );

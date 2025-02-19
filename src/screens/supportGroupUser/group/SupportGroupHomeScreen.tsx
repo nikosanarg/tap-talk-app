@@ -22,60 +22,40 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupHomeScreenNavProp>();
   const { user } = useUser();
   const { supportGroup } = useSupportGroup();
-  const { notifications, deleteResolvedNotifications, fetchNotifications } = useNotifications();
-  const [subtitleVisible, setSubtitleVisible] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-
-  const handleGoToMenu = () => {
-    navigation.navigate('SupportGroupMenu');
-  };
-
-  const handleGoToEdit = () => {
-    navigation.navigate('SupportGroupEdit');
-  };
-
-  const handleCopyInvitationCode = () => {
-    if (supportGroup?.codigoInvitacion) {
-      Clipboard.setString(supportGroup.codigoInvitacion);
-      console.log("🔗 Código de invitación copiado al Clipboard:", supportGroup.codigoInvitacion);
-    }
-    setSubtitleVisible(true)
-  };
+  const { notifications, deleteResolvedNotifications } = useNotifications();
+  const [subtitleVisible, setSubtitleVisible] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (user && supportGroup) {
       setIsAdmin(user.uid === supportGroup.creadorId);
     }
-  }, [user, supportGroup, notifications]);
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      if (!!!supportGroup?.id) return
-      await fetchNotifications();
-      console.log(`📩 Update recurrente de Notificaciones para el Grupo "${supportGroup.id}"`);
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications, supportGroup?.id]);
+  }, [user, supportGroup]);
 
   const handleDeleteResolvedNotifications = async () => {
     await deleteResolvedNotifications();
-  }
+  };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <Header />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <HeaderBoldTitle>Asistiendo a {supportGroup?.nombreAsistido || '...'}</HeaderBoldTitle>
 
         <TouchableMenu>
-          <TouchableMenuButton title='Modificar grupo y miembros' iconName="settings" onPress={handleGoToEdit} disabled={!isAdmin} />
+          <TouchableMenuButton title='Modificar grupo y miembros' iconName="settings" onPress={() => navigation.navigate('SupportGroupEdit')} disabled={!isAdmin} />
           <TouchableMenuButton
             title="Copiar código de invitación"
             subtitle={supportGroup?.codigoInvitacion}
             subtitleVisible={subtitleVisible}
             iconName="copy"
-            onPress={handleCopyInvitationCode}
+            onPress={() => {
+              if (supportGroup?.codigoInvitacion) {
+                Clipboard.setString(supportGroup.codigoInvitacion);
+                setSubtitleVisible(true);
+              }
+            }}
           />
           <TouchableMenuButton title='Borrar notificaciones resueltas' iconName="trash-bin" onPress={handleDeleteResolvedNotifications} />
         </TouchableMenu>
@@ -94,7 +74,7 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
         </SupportGroupListContainer>
 
         <StyledContextualView>
-          <MenuActionButton onPress={handleGoToMenu}>
+          <MenuActionButton onPress={() => navigation.navigate('SupportGroupMenu')}>
             <ActionButtonText>Volver a la lista de grupos</ActionButtonText>
           </MenuActionButton>
         </StyledContextualView>
