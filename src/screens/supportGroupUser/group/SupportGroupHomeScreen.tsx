@@ -22,7 +22,8 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupHomeScreenNavProp>();
   const { user } = useUser();
   const { supportGroup } = useSupportGroup();
-  const { notifications, deleteResolvedNotifications } = useNotifications();
+  const { notifications, deleteResolvedNotifications, fetchNotifications } = useNotifications();
+  const [subtitleVisible, setSubtitleVisible] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
 
   const handleGoToMenu = () => {
@@ -38,13 +39,27 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
       Clipboard.setString(supportGroup.codigoInvitacion);
       console.log("🔗 Código de invitación copiado al Clipboard:", supportGroup.codigoInvitacion);
     }
+    setSubtitleVisible(true)
   };
 
   useEffect(() => {
     if (user && supportGroup) {
       setIsAdmin(user.uid === supportGroup.creadorId);
     }
-  }, [user, supportGroup]);
+  }, [user, supportGroup, notifications]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (!!!supportGroup?.id) return
+      await fetchNotifications();
+      console.log(`📩 Update recurrente de Notificaciones para el Grupo "${supportGroup.id}"`);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications, supportGroup?.id]);
+
+  const handleDeleteResolvedNotifications = async () => {
+    await deleteResolvedNotifications();
+  }
 
   return (
     <SafeAreaView>
@@ -55,8 +70,14 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
         <TouchableMenu>
           <TouchableMenuButton title='Modificar grupo y miembros' iconName="settings" onPress={handleGoToEdit} disabled={!isAdmin} />
-          <TouchableMenuButton title='Copiar código de invitación' iconName="copy" onPress={handleCopyInvitationCode} />
-          <TouchableMenuButton title='Borrar notificaciones resueltas' iconName="trash-bin" onPress={deleteResolvedNotifications} />
+          <TouchableMenuButton
+            title="Copiar código de invitación"
+            subtitle={supportGroup?.codigoInvitacion}
+            subtitleVisible={subtitleVisible}
+            iconName="copy"
+            onPress={handleCopyInvitationCode}
+          />
+          <TouchableMenuButton title='Borrar notificaciones resueltas' iconName="trash-bin" onPress={handleDeleteResolvedNotifications} />
         </TouchableMenu>
 
         <SupportGroupListContainer>

@@ -61,6 +61,8 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       await batch.commit();
       setNotifications(prev => prev.filter((notification: INotification) => !notification.fechaResuelta));
       console.log("✅ Notificaciones resueltas eliminadas exitosamente para el grupo", supportGroup.id);
+      await fetchNotifications();
+      console.log("✅ Descarga de la imagen actualizada de notificaciones para el grupo", supportGroup.id);
     } catch (error) {
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
@@ -81,6 +83,8 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       await batch.commit();
       setNotifications(prev => prev.filter((notification: INotification) => !notification.fechaResuelta));
       console.log("✅ Notificaciones resueltas eliminadas exitosamente para el grupo", supportGroup.id);
+      await fetchNotifications();
+      console.log("✅ Descarga de la imagen actualizada de notificaciones para el grupo", supportGroup.id);
     } catch (error) {
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
