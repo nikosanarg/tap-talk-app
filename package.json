@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "android-reset": "npx react-native start --reset-cache",
     "ios": "react-native run-ios",
     "build": "npm run build",
     "start": "react-native start",
@@ -12,6 +13,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "logs-realphone": "adb -s ZT322SFB2H logcat *:S ReactNative:V ReactNativeJS:V",
     "build-bundle": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/"
   },
   "dependencies": {
