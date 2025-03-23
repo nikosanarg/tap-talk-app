@@ -1,5 +1,10 @@
 import styled from 'styled-components/native';
-import { TactileSelectionBox } from '../components/tactileOptionButton/TactileOptionButtonStyled';
+
+export const TactileSelectionBox = styled.View`
+  border-radius: 16px;
+  align-items: center;
+  justify-content: center;
+`;
 
 export const NotificationBox = styled(TactileSelectionBox)`
   width: 250px;
@@ -9,9 +14,9 @@ export const NotificationBox = styled(TactileSelectionBox)`
 `;
 
 export const NotificationText = styled.Text`
-  font-size: 24px;
+  font-size: 48px;
   font-weight: bold;
-  color: #4a4a4a;
+  color: #ffffff;
   text-align: center;
   margin-top: 10px;
 `;

@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { TactileSelectionBox } from '../components/tactileOptionButton/TactileOptionButtonStyled';
+import { TactileSelectionBox } from './assistUser';
 
 export const CategoriesScreenContainer = styled.View`
   flex-direction: column;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { PictogramsScreenContainer, PictogramBox, PictogramText, StyledPictogramsContainer, PictogramIconBox } from '../../styles/pictograms';
+import { PictogramsScreenContainer, PictogramText, StyledPictogramsContainer, PictogramIconBox } from '../../styles/pictograms';
 import { useCategories } from '../../contexts/CategoriesContext';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { IPictogram } from '../../types/Pictogram';
@@ -43,22 +43,18 @@ function PictogramsScreen(): React.JSX.Element {
     });
   };
 
-  const getButtonPictogramToShow = (pictogram: IPictogram) => {
+  const getButtonPictogramToShow = (pictogram: IPictogram, categoryColor: string) => {
     if (pictogram.icono !== "") {
       return (
-        <PictogramIconBox>
-          <Icon name={pictogram.icono ?? 'search-off'} size={128} color={categoryColor ?? '#9E9E9E'} />
-        </PictogramIconBox>
+          <Icon name={pictogram.icono || 'search-off'} size={128} color={categoryColor || '#9E9E9E'} />
       );
     } else {
       return (
-        <PictogramBox>
           <ImageBackground
-            source={{ uri: pictogram.imagenUrl ?? EMPTY_ICON_PLACEHOLDER }}
+            source={{ uri: pictogram.imagenUrl || EMPTY_ICON_PLACEHOLDER }}
             style={{ width: '100%', height: '100%' }}
             imageStyle={{ borderRadius: 16 }}
           />
-        </PictogramBox>
       );
     }
   }
@@ -79,7 +75,9 @@ function PictogramsScreen(): React.JSX.Element {
                   key={pictogram.id}
                   onPress={() => handlePictogramPress(pictogram)}
                 >
-                  { getButtonPictogramToShow(pictogram) }
+                  <PictogramIconBox>
+                    {getButtonPictogramToShow(pictogram, categoryColor)}
+                  </PictogramIconBox>
                   <PictogramText>{pictogram.nombre}</PictogramText>
                 </TouchableOpacity>
               ))}
