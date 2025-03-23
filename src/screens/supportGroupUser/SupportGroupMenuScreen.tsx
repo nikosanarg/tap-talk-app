@@ -104,7 +104,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
           <Picker
             selectedValue={sortOption}
             onValueChange={(value) => setSortOption(value)}
-            style={{ width: '80%', backgroundColor: '#e7e4e0', borderRadius: 10 }}
+            style={{ width: '70%', height: '18%', backgroundColor: '#d7d4d0', color: '#243396' }}
           >
             <Picker.Item label="Más recientes primero" value="recentFirst" />
             <Picker.Item label="Más antiguos primero" value="oldestFirst" />

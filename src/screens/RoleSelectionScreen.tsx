@@ -19,7 +19,7 @@ type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleS
 function RoleSelectionScreen(): React.JSX.Element {
   const navigation = useNavigation<RoleSelectionScreenNavProp>();
   const { categories, fetchCategories, pictograms, fetchAllPictograms, loading, error } = useCategories();
-  const { setSupportGroup } = useSupportGroup(); 
+  const { setSupportGroup } = useSupportGroup();
 
   useEffect(() => {
     const checkGroupId = async () => {
@@ -50,21 +50,19 @@ function RoleSelectionScreen(): React.JSX.Element {
     };
     checkGroupId();
   }, [navigation]);
-  
-  const initCategoriesAndPictograms = async () => {
-    let fetchedCategories: any = categories
-    if (categories.length === 0) {
-      fetchedCategories = await fetchCategories();
-    }
-    const hasPictograms = Object.keys(pictograms).length > 0 && 
-    fetchedCategories.every((category: ICategory) => pictograms[category.id]?.length > 0);
-    if (!hasPictograms) {
-      fetchAllPictograms({ categories: fetchedCategories });
-    } else {
-      console.log('✅ Pictogramas ya cargados:', pictograms);
-    }
-  };
 
+  const initCategoriesAndPictograms = async () => {
+    let fetchedCategories: ICategory[] = categories
+    fetchedCategories = await fetchCategories();
+    console.log(`📥 Categorías descargadas: [${fetchedCategories.map(c => c.nombre).join(', ')}]`);
+    const fetchedPictograms = await fetchAllPictograms({ categories: fetchedCategories });
+    console.log(
+      '📥 Pictogramas descargados:',
+      Object.entries(fetchedPictograms)
+      .map(([key, arr]) => `${key.slice(0, 4)}…: ${arr.length}`)
+      .join(', ')
+    );
+  };
   const handleClickRoleAssistedUser = () => {
     navigation.navigate('Link');
   };

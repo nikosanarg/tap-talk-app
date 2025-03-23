@@ -17,30 +17,34 @@ function LinkScreen(): React.JSX.Element {
   const [linkCode, setLinkCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const { setSupportGroup, fetchGroupByCode } = useSupportGroup()
-
+  
   const handleLinkUser = async () => {
-    const groupCode = linkCode;
-    console.log(`🟢 Iniciando vinculación con el código: ${groupCode}`);
+    console.log(`🟢 Iniciando vinculación con el código: ${linkCode}`);
     try {
-      const groupSnapshot = await fetchGroupByCode(groupCode)
-      if (groupSnapshot.empty) {
-        console.log(`🚫 Grupo no encontrado con el código: ${groupCode}`);
+      const groupData = await fetchGroupByCode(linkCode);
+      if (!groupData) {
+        console.log(`🚫 Grupo no encontrado con el código: ${linkCode}`);
         setErrorMessage('🚫 No se encontró un grupo con ese código de vinculación');
         return;
       }
   
-      const groupDoc = groupSnapshot.docs[0];
-      const groupData: IFirestoreSupportGroup = groupDoc.data() as IFirestoreSupportGroup;
-      console.log(`🔵 Grupo encontrado: ID=${groupDoc.id}, Datos: ${JSON.stringify(groupData)}`);
-
-      await AsyncStorage.setItem('groupId', groupDoc.id);
-      setSupportGroup(groupData)
+      try {
+        await AsyncStorage.setItem('groupId', groupData.id);
+        console.log(`📥 Grupo descargado y almacenado en el Storage`);
+      } catch (error) {
+        console.error(`🚫 Error guardando el grupo vinculado`);
+        setErrorMessage('Error guardando el grupo vinculado.');
+        return;
+      }
+  
+      setSupportGroup(groupData);
       navigation.navigate('Categories');
     } catch (error) {
       console.error(`🚫 Error al vincularse al grupo: ${JSON.stringify(error)}`);
       setErrorMessage('Error al vincularse. Intente de nuevo.');
     }
   };
+  
   
   return (
     <SafeAreaView>

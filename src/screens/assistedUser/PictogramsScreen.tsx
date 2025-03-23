@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { PictogramsScreenContainer, PictogramBox, PictogramText, StyledPictogramsContainer } from '../../styles/pictograms';
-import { getCategoryColor } from '../../utils/getCategoryColor';
-import { EMPTY_ICON_PLACEHOLDER } from '../../utils/constants';
+import { PictogramsScreenContainer, PictogramBox, PictogramText, StyledPictogramsContainer, PictogramIconBox } from '../../styles/pictograms';
 import { useCategories } from '../../contexts/CategoriesContext';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { IPictogram } from '../../types/Pictogram';
+import { basicPictograms } from '../../mocks/pictograms.mock';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { EMPTY_ICON_PLACEHOLDER } from '../../utils/constants';
 
 type PictogramsScreenRouteProp = RouteProp<RootStackParamList, 'Pictograms'>;
 type PictogramsScreenNavProp = StackNavigationProp<RootStackParamList, 'Pictograms'>;
@@ -17,19 +18,19 @@ function PictogramsScreen(): React.JSX.Element {
   const navigation = useNavigation<PictogramsScreenNavProp>();
   const { selectedCategory, pictograms } = useCategories();
   const [categoryPictograms, setCategoryPictograms] = useState<IPictogram[]>([]);
-  
+
   const { supportGroupId } = route.params;
   const [categoryColor, setCategoryColor] = useState<string>('#ffffff');
-  
+
   useEffect(() => {
     if (!selectedCategory) {
       console.log('🚫 Error: Categoría no seleccionada');
       return;
     }
-    const color = getCategoryColor(selectedCategory.nombre);
-    setCategoryColor(color);
-    const fetchedPictograms = pictograms[selectedCategory.id] || [];
-    console.log(`🙏 Pictogramas en PictogramsScreen: ${fetchedPictograms?.map(p => p.nombre)}`);
+    console.log(`🟢 Categoría seleccionada: ${selectedCategory.nombre} (ID ${selectedCategory.id})`);
+    setCategoryColor(selectedCategory.color || '#e0e0e0');
+    const fetchedPictograms = pictograms[selectedCategory.id] || basicPictograms[selectedCategory.nombre as keyof typeof basicPictograms] || [];
+    console.log(`👜 Pictogramas en PictogramsScreen: ${fetchedPictograms?.map((p: IPictogram) => p.nombre)}`);
 
     setCategoryPictograms(fetchedPictograms);
   }, [selectedCategory, pictograms]);
@@ -42,10 +43,30 @@ function PictogramsScreen(): React.JSX.Element {
     });
   };
 
+  const getButtonPictogramToShow = (pictogram: IPictogram) => {
+    if (pictogram.icono !== "") {
+      return (
+        <PictogramIconBox>
+          <Icon name={pictogram.icono ?? 'search-off'} size={128} color={categoryColor ?? '#9E9E9E'} />
+        </PictogramIconBox>
+      );
+    } else {
+      return (
+        <PictogramBox>
+          <ImageBackground
+            source={{ uri: pictogram.imagenUrl ?? EMPTY_ICON_PLACEHOLDER }}
+            style={{ width: '100%', height: '100%' }}
+            imageStyle={{ borderRadius: 16 }}
+          />
+        </PictogramBox>
+      );
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: categoryColor }}>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 16 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 36 }}>
           Pictogramas
         </Text>
         {categoryPictograms.length === 0 ? (
@@ -58,13 +79,7 @@ function PictogramsScreen(): React.JSX.Element {
                   key={pictogram.id}
                   onPress={() => handlePictogramPress(pictogram)}
                 >
-                  <PictogramBox>
-                    <ImageBackground
-                      source={{ uri: pictogram.imagenUrl ?? EMPTY_ICON_PLACEHOLDER }}
-                      style={{ width: '100%', height: '100%' }}
-                      imageStyle={{ borderRadius: 16 }}
-                    />
-                  </PictogramBox>
+                  { getButtonPictogramToShow(pictogram) }
                   <PictogramText>{pictogram.nombre}</PictogramText>
                 </TouchableOpacity>
               ))}

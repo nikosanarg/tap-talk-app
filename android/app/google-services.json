@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "76659237136",
     "project_id": "taptalk-lina",
-    "storage_bucket": "taptalk-lina.appspot.com"
+    "storage_bucket": "taptalk-lina.firebasestorage.app"
   },
   "client": [
     {

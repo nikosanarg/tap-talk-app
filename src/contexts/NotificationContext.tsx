@@ -9,6 +9,7 @@ interface NotificationContextType {
   deleteAllNotifications: () => Promise<void>;
   deleteResolvedNotifications: () => Promise<void>;
   fromSnapshot: React.MutableRefObject<boolean>;
+  fetchNotifications: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -109,9 +110,8 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
-
   return (
-    <NotificationContext.Provider value={{ notifications, setNotifications, deleteAllNotifications, deleteResolvedNotifications, fromSnapshot }}>
+    <NotificationContext.Provider value={{ notifications, setNotifications, deleteAllNotifications, deleteResolvedNotifications, fromSnapshot, fetchNotifications }}>
       {children}
     </NotificationContext.Provider>
   );

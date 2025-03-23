@@ -8,6 +8,7 @@ import { getCategoryColor } from '../../utils/getCategoryColor';
 import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useCategories } from '../../contexts/CategoriesContext';
 
 interface NotificationCardProps {
   notification: INotification
@@ -17,7 +18,8 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { user } = useUser();
   const { fetchNotifications } = useNotifications();
-  const categoryColor = getCategoryColor(notification.categoria);
+  const { categories } = useCategories();
+  const categoryColor = getCategoryColor(notification.categoria, categories);
 
   const handlePress = () => {
     setModalVisible(true);

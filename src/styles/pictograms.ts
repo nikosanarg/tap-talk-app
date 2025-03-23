@@ -10,7 +10,7 @@ export const StyledPictogramsContainer = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-top: 20px;
   gap: 12px;
 `;
 
@@ -21,9 +21,16 @@ export const PictogramBox = styled(TactileSelectionBox)`
   margin: 8px;
 `;
 
+export const PictogramIconBox = styled(TactileSelectionBox)`
+  width: 140px;
+  height: 140px;
+  margin: 8px;
+  background-color: #FFFFFF;
+`;
+
 export const PictogramText = styled.Text`
-  font-size: 32px;
-  color: #000;
+  font-size: 24px;
+  color: #FFFFFF;
   text-align: center;
   margin-bottom: 20px;
   margin-top: -12px;

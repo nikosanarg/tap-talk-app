@@ -10,17 +10,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AssistedUserHeader from '../../components/header/AssistedUserHeader';
 import { ICategory } from '../../types/Category';
 
-const backgroundImageAcciones: any = require('../../../assets/images/category-acciones.jpg');
-const backgroundImageGente: any = require('../../../assets/images/category-gente.jpg');
-const backgroundImageSalud: any = require('../../../assets/images/category-salud.jpg');
-const backgroundImageComida: any = require('../../../assets/images/category-comida.jpg');
-const backgroundImageVacio: any = require('../../../assets/images/category-vacio.jpg');
+const activityIconImg: any = require('../../../assets/images/category-icons/activity.jpg');
+const basicsIconImg: any = require('../../../assets/images/category-icons/basics.jpg');
+const emotionsIconImg: any = require('../../../assets/images/category-icons/emotions.jpg');
+const helpIconImg: any = require('../../../assets/images/category-icons/help.jpg');
+const preferencesIconImg: any = require('../../../assets/images/category-icons/preferences.jpg');
+const socialIconImg: any = require('../../../assets/images/category-icons/social.jpg');
+const emptyIconImg: any = require('../../../assets/images/category-vacio.jpg');
 
-const backgroundImages: Record<'Acciones' | 'Gente' | 'Salud' | 'Comida', any> = {
-  Acciones: backgroundImageAcciones,
-  Gente: backgroundImageGente,
-  Salud: backgroundImageSalud,
-  Comida: backgroundImageComida,
+const backgroundImages: Record<'Actividades' | 'Basicas' | 'Emociones' | 'Ayuda' | 'Preferencias' | 'Social' | 'Vacio', any> = {
+  Actividades: activityIconImg,
+  Basicas: basicsIconImg,
+  Emociones: emotionsIconImg,
+  Ayuda: helpIconImg,
+  Preferencias: preferencesIconImg,
+  Social: socialIconImg,
+  Vacio: emptyIconImg,
 }
 
 type CategoriesScreenNavProp = StackNavigationProp<RootStackParamList, 'Categories'>;
@@ -29,11 +34,11 @@ const CategoriesScreen = () => {
   const navigation = useNavigation<CategoriesScreenNavProp>();
   const { categories, loading, error, setSelectedCategory, fetchCategories } = useCategories();
   const { supportGroup } = useSupportGroup();
-  console.log(`🙏 Categorías en CategoriesScreen: ${categories?.map(c => c.nombre)}`);
+  console.log(`👜 Categorías en CategoriesScreen (${categories.length}): ${categories?.map(c => c.nombre.slice(0, 3))}`);
 
   const handleCategoryPress = (category: ICategory) => {
     if (!supportGroup) return
-    setSelectedCategory( category )
+    setSelectedCategory(category)
     navigation.navigate('Pictograms', { supportGroupId: supportGroup.id });
   };
 
@@ -51,10 +56,8 @@ const CategoriesScreen = () => {
   }, [supportGroup]);
 
   useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories();
-    }
-  }, [categories]);
+    fetchCategories();
+  }, []);
 
   if (loading) {
     return (
@@ -85,7 +88,7 @@ const CategoriesScreen = () => {
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <AssistedUserHeader assistedUserName={supportGroup.nombreAsistido}/>
+        <AssistedUserHeader assistedUserName={supportGroup.nombreAsistido} />
 
         <CategoriesScreenContainer>
           <StyledCategoriesContainer>
@@ -93,7 +96,7 @@ const CategoriesScreen = () => {
               <TouchableOpacity key={category.id} onPress={() => handleCategoryPress(category)}>
                 <CategoryBox>
                   <ImageBackground
-                    source={(backgroundImages[category.nombre as keyof typeof backgroundImages]) ?? backgroundImageVacio}
+                    source={(backgroundImages[category.nombre as keyof typeof backgroundImages]) ?? emptyIconImg}
                     style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
                     imageStyle={{ borderRadius: 16 }}
                   >
@@ -103,9 +106,9 @@ const CategoriesScreen = () => {
               </TouchableOpacity>
             ))}
           </StyledCategoriesContainer>
-          <HelpButton onPress={handleHelpPress}>
+          {/* <HelpButton onPress={handleHelpPress}>
             <HelpButtonText>AYUDA</HelpButtonText>
-          </HelpButton>
+          </HelpButton> */}
         </CategoriesScreenContainer>
       </ScrollView>
     </SafeAreaView>
