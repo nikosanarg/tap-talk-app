@@ -13,6 +13,7 @@ import { IFirestoreSupportGroup } from '../../types/SupportGroup';
 import { Picker } from '@react-native-picker/picker';
 import Header from '../../components/header/Header';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 type SupportGroupMenuScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupMenu'>;
 
@@ -23,6 +24,9 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
   const [groups, setGroups] = useState<IFirestoreSupportGroup[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<string>('recentFirst');
+  const { getPendingNotificationCounts } = useNotifications();
+
+  const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
 
   const fetchGroups = async () => {
     if (!user?.uid) {
@@ -68,9 +72,21 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchGroups();
+      const loadGroupsAndCounts = async () => {
+        await fetchGroups(); // actualiza `groups`
+      };
+      loadGroupsAndCounts();
     }, [user?.uid, sortOption])
   );
+  
+  useEffect(() => {
+    const loadCounts = async () => {
+      const groupIds = groups.map(g => g.id);
+      const counts = await getPendingNotificationCounts(groupIds);
+      setPendingCounts(counts);
+    };
+    if (groups.length > 0) loadCounts();
+  }, [groups]);
   
   const handleJoinGroup = () => {
     navigation.navigate('JoinGroup');
@@ -118,7 +134,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
         <SupportGroupListContainer>
           {groups.length > 0 ? (
             groups.map(group => (
-              <AssistCard group={group} callback={() => handleClickGroup(group)} key={group.id} />
+              <AssistCard group={group} callback={() => handleClickGroup(group)} key={group.id} pendingCount={pendingCounts[group.id] || 0}/>
             ))
           ) : (
             <Text style={{ textAlign: 'center', marginTop: 10 }}>No estás unido a ningún grupo.</Text>

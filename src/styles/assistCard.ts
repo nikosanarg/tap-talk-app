@@ -44,3 +44,21 @@ export const GroupActionButton = styled(ActionButton)`
   text-align: center;
   padding-bottom: 6px;
 `
+export const StyledBadgeContainer = styled.View`
+  position: absolute;
+  top: 12px;
+  right: 48px;
+  background-color: red;
+  border-radius: 12px;
+  min-width: 24px;
+  padding: 2px 6px;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+`;
+
+export const StyledBadgeText = styled.Text`
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+`;

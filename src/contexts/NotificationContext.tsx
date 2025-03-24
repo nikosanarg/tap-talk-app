@@ -10,6 +10,8 @@ interface NotificationContextType {
   deleteResolvedNotifications: () => Promise<void>;
   fromSnapshot: React.MutableRefObject<boolean>;
   fetchNotifications: () => Promise<void>;
+  getPendingNotificationCount: (grupoId: string) => Promise<number>;
+  getPendingNotificationCounts: (grupoIds: string[]) => Promise<Record<string, number>>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -46,14 +48,14 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   useEffect(() => {
     if (!supportGroup?.id) return;
 
-    fetchNotifications(); // ✅ Carga inicial
+    fetchNotifications();
 
     const unsubscribe = firestore()
       .collection('Notificaciones')
       .where('grupoId', '==', supportGroup.id)
       .orderBy('fechaCreacion', 'desc')
       .onSnapshot(snapshot => {
-        fromSnapshot.current = true; // 🔥 Cambios en vivo vienen del snapshot
+        fromSnapshot.current = true;
         const fetchedNotifications = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
@@ -110,8 +112,40 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
+
+  const getPendingNotificationCount = async (grupoId: string): Promise<number> => {
+    const snapshot = await firestore()
+      .collection('Notificaciones')
+      .where('grupoId', '==', grupoId)
+      .where('fechaResuelta', '==', null)
+      .get();
+    return snapshot.size;
+  };
+
+  const getPendingNotificationCounts = async (grupoIds: string[]): Promise<Record<string, number>> => {
+    const counts: Record<string, number> = {};
+    await Promise.all(grupoIds.map(async (grupoId) => {
+      const snapshot = await firestore()
+        .collection('Notificaciones')
+        .where('grupoId', '==', grupoId)
+        .where('fechaResuelta', '==', null)
+        .get();
+      counts[grupoId] = snapshot.size;
+    }));
+    return counts;
+  };
+
   return (
-    <NotificationContext.Provider value={{ notifications, setNotifications, deleteAllNotifications, deleteResolvedNotifications, fromSnapshot, fetchNotifications }}>
+    <NotificationContext.Provider value={{
+      notifications,
+      setNotifications,
+      deleteAllNotifications,
+      deleteResolvedNotifications,
+      fromSnapshot,
+      fetchNotifications,
+      getPendingNotificationCount,
+      getPendingNotificationCounts
+    }}>
       {children}
     </NotificationContext.Provider>
   );
