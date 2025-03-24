@@ -19,6 +19,8 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
   const { user } = useUser();
   const { fetchNotifications } = useNotifications();
   const { categories } = useCategories();
+  if (categories.length === 0) return null;
+  
   const categoryColor = getCategoryColor(notification.categoria, categories);
 
   const handlePress = () => {

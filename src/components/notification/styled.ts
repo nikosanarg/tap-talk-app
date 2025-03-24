@@ -25,7 +25,7 @@ export const BaseTouchableIconButton = styled.TouchableOpacity`
 export const NotificationCategoryLabel = styled.Text`
   font-weight: bold;
   font-size: 14;
-  color:#333;
+  color:#fff;
 `
 
 export const NotificationCategoryTitle = styled.Text`

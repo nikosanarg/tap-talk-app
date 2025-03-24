@@ -22,7 +22,6 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
         id: doc.id,
       }));
       setCategories(fetchedCategories);
-      fetchAllPictograms({ categories: fetchedCategories });
       return fetchedCategories;
     } catch (err) {
       console.error('🚫 Error al obtener categorías:', err);
@@ -65,6 +64,18 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   };
+
+  const initCategoriesAndPictograms = async () => {
+    const fetchedCategories = await fetchCategories();
+    console.log(`📥 Categorías descargadas: [${fetchedCategories.map(c => c.nombre).join(', ')}]`);
+    const fetchedPictograms = await fetchAllPictograms({ categories: fetchedCategories });
+    console.log(
+      '📥 Pictogramas descargados:',
+      Object.entries(fetchedPictograms)
+        .map(([key, arr]) => `${key.slice(0, 4)}…: ${arr.length}`)
+        .join(', ')
+    );
+  };
   
   return (
     <CategoriesContext.Provider
@@ -75,6 +86,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
         error,
         fetchCategories,
         fetchAllPictograms,
+        initCategoriesAndPictograms,
         setCategories,
         selectedCategory,
         setSelectedCategory

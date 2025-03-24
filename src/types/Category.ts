@@ -18,4 +18,5 @@ export interface CategoriesContextType {
   setSelectedCategory: React.Dispatch<React.SetStateAction<ICategory | null>>;
   fetchAllPictograms: ({ categories }: any) => Promise<Record<string, IPictogram[]>> ;
   fetchCategories: () => Promise<ICategory[]>;
+  initCategoriesAndPictograms: () => Promise<any>;
 }

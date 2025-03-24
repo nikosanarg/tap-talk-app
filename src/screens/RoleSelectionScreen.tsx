@@ -12,18 +12,17 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useCategories } from '../contexts/CategoriesContext';
 import { useSupportGroup } from '../contexts/SupportGroupContext';
 import { IFirestoreSupportGroup } from '../types/SupportGroup';
-import { ICategory } from '../types/Category';
 
 type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleSelection'>;
 
 function RoleSelectionScreen(): React.JSX.Element {
   const navigation = useNavigation<RoleSelectionScreenNavProp>();
-  const { categories, fetchCategories, pictograms, fetchAllPictograms, loading, error } = useCategories();
+  const { initCategoriesAndPictograms, loading, error } = useCategories();
+  
   const { setSupportGroup } = useSupportGroup();
 
   useEffect(() => {
     const checkGroupId = async () => {
-      // if (categories.length === 0) await fetchCategories();
       const groupId = await AsyncStorage.getItem('groupId');
       if (groupId) {
         console.log(`🟢 Autenticación automática para el usuario asistido con groupId: ${groupId}`);
@@ -51,18 +50,6 @@ function RoleSelectionScreen(): React.JSX.Element {
     checkGroupId();
   }, [navigation]);
 
-  const initCategoriesAndPictograms = async () => {
-    let fetchedCategories: ICategory[] = categories
-    fetchedCategories = await fetchCategories();
-    console.log(`📥 Categorías descargadas: [${fetchedCategories.map(c => c.nombre).join(', ')}]`);
-    const fetchedPictograms = await fetchAllPictograms({ categories: fetchedCategories });
-    console.log(
-      '📥 Pictogramas descargados:',
-      Object.entries(fetchedPictograms)
-      .map(([key, arr]) => `${key.slice(0, 4)}…: ${arr.length}`)
-      .join(', ')
-    );
-  };
   const handleClickRoleAssistedUser = () => {
     navigation.navigate('Link');
   };
