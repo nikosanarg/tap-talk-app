@@ -22,6 +22,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
         id: doc.id,
       }));
       setCategories(fetchedCategories);
+      fetchAllPictograms({ categories: fetchedCategories });
       return fetchedCategories;
     } catch (err) {
       console.error('🚫 Error al obtener categorías:', err);
