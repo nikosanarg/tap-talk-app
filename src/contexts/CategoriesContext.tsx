@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import { CategoriesContextType, ICategory } from '../types/Category';
 import { IPictogram } from '../types/Pictogram';
@@ -22,7 +22,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
         id: doc.id,
       }));
       setCategories(fetchedCategories);
-      fetchAllPictograms({ categories: fetchedCategories });
+      // fetchAllPictograms({ categories: fetchedCategories });
       return fetchedCategories;
     } catch (err) {
       console.error('🚫 Error al obtener categorías:', err);
@@ -66,7 +66,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const initCategoriesAndPictograms = async () => {
+  const initCategoriesAndPictograms = useCallback(async () => {
     const fetchedCategories = await fetchCategories();
     console.log(`📥 Categorías descargadas: [${fetchedCategories.map(c => c.nombre).join(', ')}]`);
     const fetchedPictograms = await fetchAllPictograms({ categories: fetchedCategories });
@@ -76,7 +76,7 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
         .map(([key, arr]) => `${key.slice(0, 4)}…: ${arr.length}`)
         .join(', ')
     );
-  };
+  }, [fetchCategories, fetchAllPictograms]);  
   
   return (
     <CategoriesContext.Provider

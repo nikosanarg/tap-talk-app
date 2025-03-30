@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, Text } from 'react-native';
 import TapTalkTrademark from '../components/TapTalkTrademark';
 import { useNavigation } from '@react-navigation/native';
@@ -21,12 +21,27 @@ function RoleSelectionScreen(): React.JSX.Element {
   const { initCategoriesAndPictograms, loading, error } = useCategories();
   const { setSupportGroup } = useSupportGroup();
   const { backendIp } = useBackendIp();
-
+  const alreadyFetchedRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 3;
+  
   useEffect(() => {
     const checkGroupId = async () => {
+      if (alreadyFetchedRef.current) {
+        console.log('⚠️ Ya se hizo el fetch exitosamente, no se repite.');
+        return;
+      }
+  
+      if (retryCountRef.current >= MAX_RETRIES) {
+        console.warn(`❌ Máximo de reintentos alcanzado (${MAX_RETRIES}), no se vuelve a intentar.`);
+        return;
+      }
+  
       const groupId = await AsyncStorage.getItem('groupId');
       if (groupId) {
-        console.log(`🟢 Autenticación automática para el usuario asistido con groupId: ${groupId}`);
+        console.log(`🟢 Intento #${retryCountRef.current + 1} - Autenticación con groupId: ${groupId}`);
+        retryCountRef.current += 1;
+  
         const groupDoc = await firestore().collection('Grupos').doc(groupId).get();
         if (groupDoc.exists && groupDoc.data()) {
           const data = groupDoc.data();
@@ -41,7 +56,9 @@ function RoleSelectionScreen(): React.JSX.Element {
           };
           setSupportGroup(groupData);
           await initCategoriesAndPictograms();
-
+  
+          alreadyFetchedRef.current = true; // 🟢 Solo lo marcamos si TODO salió bien
+  
           if (backendIp) {
             navigation.navigate('Categories');
           } else {
@@ -54,8 +71,8 @@ function RoleSelectionScreen(): React.JSX.Element {
       }
     };
     checkGroupId();
-  }, [navigation, backendIp, initCategoriesAndPictograms, setSupportGroup]);
-
+  }, [backendIp, initCategoriesAndPictograms, setSupportGroup]);
+  
   const handleClickRoleAssistedUser = () => {
     navigation.navigate('Link');
   };
