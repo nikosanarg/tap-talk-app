@@ -11,6 +11,7 @@ import firestore from '@react-native-firebase/firestore';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useCategories } from '../contexts/CategoriesContext';
 import { useSupportGroup } from '../contexts/SupportGroupContext';
+import { useBackendIp } from '../contexts/BackendIpContext';
 import { IFirestoreSupportGroup } from '../types/SupportGroup';
 
 type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleSelection'>;
@@ -18,8 +19,8 @@ type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleS
 function RoleSelectionScreen(): React.JSX.Element {
   const navigation = useNavigation<RoleSelectionScreenNavProp>();
   const { initCategoriesAndPictograms, loading, error } = useCategories();
-  
   const { setSupportGroup } = useSupportGroup();
+  const { backendIp } = useBackendIp();
 
   useEffect(() => {
     const checkGroupId = async () => {
@@ -37,10 +38,15 @@ function RoleSelectionScreen(): React.JSX.Element {
             fechaCreacion: data?.fechaCreacion,
             miembros: data?.miembros,
             nombreAsistido: data?.nombreAsistido
-          }
+          };
           setSupportGroup(groupData);
           await initCategoriesAndPictograms();
-          navigation.navigate('Categories');
+
+          if (backendIp) {
+            navigation.navigate('Categories');
+          } else {
+            console.warn("La IP del backend aún no está disponible.");
+          }
         } else {
           console.error('🚫 Error: el grupo ya no existe');
           await AsyncStorage.removeItem('groupId');
@@ -48,7 +54,7 @@ function RoleSelectionScreen(): React.JSX.Element {
       }
     };
     checkGroupId();
-  }, [navigation]);
+  }, [navigation, backendIp, initCategoriesAndPictograms, setSupportGroup]);
 
   const handleClickRoleAssistedUser = () => {
     navigation.navigate('Link');
