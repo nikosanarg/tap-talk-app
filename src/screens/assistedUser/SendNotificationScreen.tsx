@@ -11,6 +11,7 @@ import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { IPictogram } from '../../types/Pictogram';
 import { NotificationBox, NotificationText } from '../../styles/assistUser';
+import { useBackendIp } from '../../contexts/BackendIpContext';
 
 type SendNotificationScreenRouteProp = RouteProp<RootStackParamList, 'SendNotification'>;
 type SendNotificationScreenNavProp = StackNavigationProp<RootStackParamList, 'SendNotification'>;
@@ -20,6 +21,7 @@ function SendNotificationScreen(): React.JSX.Element {
   const navigation = useNavigation<SendNotificationScreenNavProp>();
   const { pictogram, supportGroupId } = route.params;
   const { selectedCategory } = useCategories()
+  const { backendIp } = useBackendIp();
 
   const fadeAnim = new Animated.Value(0);
 
@@ -37,7 +39,7 @@ function SendNotificationScreen(): React.JSX.Element {
 
       const groupData = groupDoc.data();
       const memberIds = groupData?.miembros || [];
-      
+
       if (memberIds.length === 0) {
         console.log('⚠️ El grupo no tiene miembros para notificar');
         return;
@@ -81,8 +83,9 @@ function SendNotificationScreen(): React.JSX.Element {
       setTimeout(() => navigation.navigate('Categories'), 8000);
 
       try {
-        const backendUrl = 'http://192.168.0.153:4000';
-        const res = await fetch(`${backendUrl}/send-notification`, {
+        const backendUrl = `http://${backendIp}:4000/send-notification`;
+        console.log('🚀 Enviando notificación al backend:', backendUrl);
+        const res = await fetch(backendUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ export const BackendIpProvider = ({ children }: { children: ReactNode }) => {
       try {
         const doc = await firestore().collection('Constantes').doc('backendip').get();
         if (doc.exists) {
-          const ip = doc.data()?.ip;
+          const ip = doc.data()?.valor;
           setBackendIp(ip);
         } else {
           console.error('Error al obtener la dirección IP de la API');

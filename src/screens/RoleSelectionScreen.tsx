@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, Text } from 'react-native';
 import TapTalkTrademark from '../components/TapTalkTrademark';
 import { useNavigation } from '@react-navigation/native';
@@ -21,8 +21,10 @@ function RoleSelectionScreen(): React.JSX.Element {
   const { initCategoriesAndPictograms, loading, error } = useCategories();
   const { setSupportGroup } = useSupportGroup();
   const { backendIp } = useBackendIp();
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
+    if (initialized || !backendIp || loading) return;
     const checkGroupId = async () => {
       const groupId = await AsyncStorage.getItem('groupId');
       if (groupId) {
@@ -40,13 +42,14 @@ function RoleSelectionScreen(): React.JSX.Element {
             nombreAsistido: data?.nombreAsistido
           };
           setSupportGroup(groupData);
-          await initCategoriesAndPictograms();
+          const initStatus = await initCategoriesAndPictograms();
 
-          if (backendIp) {
+          if (initStatus) {
             navigation.navigate('Categories');
           } else {
             console.warn("La IP del backend aún no está disponible.");
           }
+          setInitialized(true)
         } else {
           console.error('🚫 Error: el grupo ya no existe');
           await AsyncStorage.removeItem('groupId');
@@ -54,7 +57,7 @@ function RoleSelectionScreen(): React.JSX.Element {
       }
     };
     checkGroupId();
-  }, [navigation, backendIp, initCategoriesAndPictograms, setSupportGroup]);
+  }, [navigation, backendIp, initCategoriesAndPictograms, setSupportGroup, initialized]);
 
   const handleClickRoleAssistedUser = () => {
     navigation.navigate('Link');
