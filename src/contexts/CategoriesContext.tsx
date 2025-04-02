@@ -14,7 +14,6 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchCategories = async () => {
     console.log('🟢 Iniciando fetch de Categorías');
-    setLoading(true);
     try {
       const categorySnapshot = await firestore().collection('Categorías').where('activo', '==', true).get();
       const fetchedCategories = categorySnapshot.docs.map(doc => ({
@@ -28,8 +27,6 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
       console.error('🚫 Error al obtener categorías:', err);
       setError(`Error al cargar las categorías: ${err}`);
       return []
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -39,7 +36,6 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
       console.log('⚠️  No hay categorías cargadas para obtener pictogramas.');
       return {};
     }
-    setLoading(true);
     try {
       const pictogramsByCategory: Record<string, IPictogram[]> = {};
       for (const category of categories) {
@@ -60,24 +56,35 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error('🚫 Error al obtener pictogramas:', err);
       setError(`Error al cargar los pictogramas: ${err}`);
-      return {}; 
-    } finally {
-      setLoading(false);
+      return {};
     }
   };
 
-  const initCategoriesAndPictograms = useCallback(async () => {
-    const fetchedCategories = await fetchCategories();
-    console.log(`📥 Categorías descargadas: [${fetchedCategories.map(c => c.nombre).join(', ')}]`);
-    const fetchedPictograms = await fetchAllPictograms({ categories: fetchedCategories });
-    console.log(
-      '📥 Pictogramas descargados:',
-      Object.entries(fetchedPictograms)
-        .map(([key, arr]) => `${key.slice(0, 4)}…: ${arr.length}`)
-        .join(', ')
-    );
-  }, [fetchCategories, fetchAllPictograms]);  
-  
+  const initCategoriesAndPictograms = async () => {
+    setLoading(true);
+    let initStatus = true;
+    console.log('🟢 Iniciando inicialización de categorías y pictogramas');
+    try {
+      const fetchedCategories = await fetchCategories();
+      console.log(`📥 Categorías descargadas: [${fetchedCategories.map(c => c.nombre).join(', ')}]`);
+      const fetchedPictograms = await fetchAllPictograms({ categories: fetchedCategories });
+      console.log(
+        '📥 Pictogramas descargados:',
+        Object.entries(fetchedPictograms)
+          .map(([key, arr]) => `${key.slice(0, 4)}…: ${arr.length}`)
+          .join(', ')
+      );
+      return true
+    } catch (error) {
+      console.error('🚫 Error al inicializar categorías y pictogramas:', error);
+      setError(`Error al inicializar: ${error}`);
+      initStatus = false
+    } finally {
+      setLoading(false);
+    }
+    return initStatus
+  };
+
   return (
     <CategoriesContext.Provider
       value={{
