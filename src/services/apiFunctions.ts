@@ -1,4 +1,4 @@
-import { ApiService } from '../services/ApiService'
+import { FirestoreApiService } from '../services/FirestoreApiService'
 import { AuthService } from './AuthService'
 
 export const apiFunctions: Record<string, Function> = {
@@ -8,24 +8,24 @@ export const apiFunctions: Record<string, Function> = {
   getCurrentUser: AuthService.getCurrentUser,
   resetPassword: AuthService.resetPassword,
 
-  getUser: ApiService.getUser,
-  createUser: ApiService.createUser,
-  updateUser: ApiService.updateUser,
-  deleteUser: ApiService.deleteUser,
+  getUser: FirestoreApiService.getUser,
+  createUser: FirestoreApiService.createUser,
+  updateUser: FirestoreApiService.updateUser,
+  deleteUser: FirestoreApiService.deleteUser,
 
-  getCategories: ApiService.getCategories,
-  getCategory: ApiService.getCategory,
-  createCategory: ApiService.createCategory,
-  updateCategory: ApiService.updateCategory,
-  deleteCategory: ApiService.deleteCategory,
+  getCategories: FirestoreApiService.getCategories,
+  getCategory: FirestoreApiService.getCategory,
+  createCategory: FirestoreApiService.createCategory,
+  updateCategory: FirestoreApiService.updateCategory,
+  deleteCategory: FirestoreApiService.deleteCategory,
 
-  getSupportGroups: ApiService.getSupportGroups,
-  createSupportGroup: ApiService.createSupportGroup,
-  updateSupportGroup: ApiService.updateSupportGroup,
-  deleteSupportGroup: ApiService.deleteSupportGroup,
+  getSupportGroups: FirestoreApiService.getSupportGroups,
+  createSupportGroup: FirestoreApiService.createSupportGroup,
+  updateSupportGroup: FirestoreApiService.updateSupportGroup,
+  deleteSupportGroup: FirestoreApiService.deleteSupportGroup,
 
-  getPictograms: ApiService.getPictograms,
-  createPictogram: ApiService.createPictogram,
-  updatePictogram: ApiService.updatePictogram,
-  deletePictogram: ApiService.deletePictogram,
+  getPictograms: FirestoreApiService.getPictograms,
+  createPictogram: FirestoreApiService.createPictogram,
+  updatePictogram: FirestoreApiService.updatePictogram,
+  deletePictogram: FirestoreApiService.deletePictogram,
 }
