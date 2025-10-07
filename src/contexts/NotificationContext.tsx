@@ -27,6 +27,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       return;
     }
     try {
+      //TO DO: CAMBIAR A USO DE API (NotificationApiService)
       const notificationsSnapshot = await firestore()
         .collection('Notificaciones')
         .where('grupoId', '==', supportGroup.id)

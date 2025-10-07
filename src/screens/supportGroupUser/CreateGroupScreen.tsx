@@ -43,6 +43,7 @@ function CreateGroupScreen(): React.JSX.Element {
       });
   
       console.log(`✅ Grupo creado exitosamente. ID: ${groupRef.id}`);
+      //TO DO: GrupoApiService.create
       navigation.navigate('SupportGroupMenu');
     } catch (error) {
       console.error('🚫 Error al crear el grupo: ', error);

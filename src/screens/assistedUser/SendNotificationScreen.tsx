@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { IPictogram } from '../../types/Pictogram';
 import { NotificationBox, NotificationText } from '../../styles/assistUser';
 import { useBackendIp } from '../../contexts/BackendIpContext';
+import NotificationApiService from '../../services/NotificationApiService';
 
 type SendNotificationScreenRouteProp = RouteProp<RootStackParamList, 'SendNotification'>;
 type SendNotificationScreenNavProp = StackNavigationProp<RootStackParamList, 'SendNotification'>;
@@ -80,6 +81,22 @@ function SendNotificationScreen(): React.JSX.Element {
         useNativeDriver: true,
       }).start();
 
+      const notificationApiPayload = {
+        pictograma_id: Number(pictogram.id),
+        titulo: pictogram.nombre,
+        categoria: selectedCategory.nombre,
+        grupo_id: Number(supportGroupId),
+        fecha_creacion: new Date().toISOString(),
+        fecha_resuelta: null,
+        miembro_resolutor: null,
+      };
+      console.log('📤 Payload a la API:', notificationApiPayload);
+      try {
+        await NotificationApiService.create(notificationApiPayload);
+        console.log('✅ Notificación enviada a la API');
+      } catch (error) {
+      console.error('🚫 Error al enviar la notificación a la API:', error);
+      }
       setTimeout(() => navigation.navigate('Categories'), 8000);
 
       try {
