@@ -15,34 +15,10 @@ type SupportGroupEditScreenNavProp = StackNavigationProp<RootStackParamList, 'Su
 
 const SupportGroupEditScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupEditScreenNavProp>();
-  const { supportGroup, setSupportGroup, fetchGroupMembers, deleteGroupById, updateGroupName, removeGroupMember } = useSupportGroup();
+  const { supportGroup, setSupportGroup, deleteGroupById, updateGroupName, removeGroupMember } = useSupportGroup();
   const { deleteAllNotifications } = useNotifications();
-  const [members, setMembers] = useState<Array<{ id: string; nombre: string }>>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [groupName, setGroupName] = useState(supportGroup?.nombreAsistido || '');
-
-  useEffect(() => {
-    fetchMembers();
-  }, [supportGroup?.miembros]);
-
-  const fetchMembers = async () => {
-    try {
-      if (!supportGroup?.miembros || supportGroup.miembros.length === 0) {
-        setMembers([]);
-        setErrorMessage("No hay miembros en el grupo.");
-        return;
-      }
-      const usersSnapshot = await fetchGroupMembers(supportGroup.miembros);
-      const fetchedMembers = usersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        nombre: doc.data().nombre || '',
-      }));
-      setMembers(fetchedMembers);
-    } catch (error) {
-      setErrorMessage("Hubo un problema buscando los miembros del grupo");
-      console.error("🚫 Error al obtener los miembros:", error);
-    }
-  };
+  const [groupName, setGroupName] = useState(supportGroup?.nombre_paciente || '');
 
   const handleRemoveMember = async (memberId: string) => {
     try {
@@ -50,9 +26,9 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
         await removeGroupMember(supportGroup.id, memberId)
         setSupportGroup(prevGroup => ({
           ...prevGroup!,
-          miembros: prevGroup!.miembros.filter(id => id !== memberId)
+          miembros: prevGroup?.miembros?.filter(m => m.id !== memberId) || []
         }));
-        setMembers(prevMembers => prevMembers.filter(member => member.id !== memberId));
+
         console.log(`🚮 Miembro ${memberId} eliminado del grupo.`);
       }
     } catch (error) {
@@ -74,7 +50,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
       await updateGroupName(supportGroup?.id, groupName);
       setSupportGroup(prevGroup => ({
         ...prevGroup!,
-        nombreAsistido: groupName
+        nombre_paciente: groupName
       }));
       Alert.alert("Éxito", "El nombre del usuario asistido ha sido actualizado.");
       console.log(`✅ Nombre del asistido actualizado a: ${groupName}`);
@@ -89,7 +65,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
       await deleteAllNotifications();
       await deleteGroupById(supportGroup.id);
 
-      Alert.alert("Grupo eliminado", `El grupo de ${supportGroup.nombreAsistido} ha sido eliminado.`);
+      Alert.alert("Grupo eliminado", `El grupo de ${supportGroup.nombre_paciente} ha sido eliminado.`);
       console.log(`🚮 Grupo ${supportGroup.id} eliminado.`);
       setSupportGroup(null);
       navigation.navigate('SupportGroupMenu');
@@ -102,7 +78,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
   const confirmDeleteGroup = () => {
     Alert.alert(
       "Confirmar eliminación",
-      `¿Estás seguro de que deseas eliminar el grupo de ${supportGroup?.nombreAsistido}? Esta acción es permanente e irreversible.`,
+      `¿Estás seguro de que deseas eliminar el grupo de ${supportGroup?.nombre_paciente}? Esta acción es permanente e irreversible.`,
       [
         { text: "Cancelar", style: "cancel" },
         { text: "Eliminar", style: "destructive", onPress: handleDeleteGroup },
@@ -137,13 +113,18 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
         <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Miembros del grupo</SupportText>
 
         <SupportGroupListContainer>
-          {members.length > 0 ? (
-            members.map(member => (
-              <AssistCard member={member} callback={() => handleRemoveMember(member.id)} key={member.id} />
+            {supportGroup?.miembros && supportGroup.miembros.length > 0 ? (
+            supportGroup.miembros.map(member => (
+              <AssistCard 
+              key={member.id}
+              member={member} 
+              pendingCount={member.pendingCount || 0} 
+              callback={() => handleRemoveMember(member.id)} 
+              />
             ))
-          ) : (
-            <Text style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Text>
-          )}
+            ) : (
+            <Text style={{ color: 'red', textAlign: 'center' }}>No hay miembros en el grupo.</Text>
+            )}
         </SupportGroupListContainer>
 
         <StyledContextualView>

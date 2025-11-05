@@ -28,7 +28,7 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
   useEffect(() => {
     if (user && supportGroup) {
-      setIsAdmin(user.uid === supportGroup.creadorId);
+      setIsAdmin(user.uid === supportGroup.creador_id);
     }
   }, [user, supportGroup]);
 
@@ -41,18 +41,18 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
       <Header />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <HeaderBoldTitle>Asistiendo a {supportGroup?.nombreAsistido || '...'}</HeaderBoldTitle>
+        <HeaderBoldTitle>Asistiendo a {supportGroup?.nombre_paciente || '...'}</HeaderBoldTitle>
 
         <TouchableMenu>
           <TouchableMenuButton title='Modificar grupo y miembros' iconName="settings" onPress={() => navigation.navigate('SupportGroupEdit')} disabled={!isAdmin} />
           <TouchableMenuButton
             title="Copiar código de invitación"
-            subtitle={supportGroup?.codigoInvitacion}
+            subtitle={supportGroup?.codigo_vinculacion}
             subtitleVisible={subtitleVisible}
             iconName="copy"
             onPress={() => {
-              if (supportGroup?.codigoInvitacion) {
-                Clipboard.setString(supportGroup.codigoInvitacion);
+              if (supportGroup?.codigo_vinculacion) {
+                Clipboard.setString(supportGroup.codigo_vinculacion);
                 setSubtitleVisible(true);
               }
             }}

@@ -1,11 +1,11 @@
 export interface IPictogram {
-  id: string;
-  nombre: string;
-  icono?: string;
-  imagenUrl?: string;
-  fechaCreacion?: any;
-  usos: number;
-  activo: boolean;
+  id: number;              
+  nombre: string;          
+  imagen_url?: string;     
+  categoria_id: number;    
+  activo: boolean;         
+  icono?: string;          
+  usos: number;            
 }
 
 export interface PictogramsProps {

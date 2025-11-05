@@ -2,7 +2,7 @@
 const BASE_URL = 'http://192.168.1.37:3000/api/notificaciones';  //ESTO FUE POR USAR EL CELULAR DE EMULADOR
 
 export interface Notification {
-  id: number;
+  id: string;
   pictograma_id: number;
   titulo: string;
   categoria: string;

@@ -8,12 +8,11 @@ import { ActionButtonText, MenuActionButton } from '../../styles/buttons';
 import { SupportGroupListContainer } from '../../styles/supportGroup';
 import { useUser } from '../../contexts/UserContext';
 import AssistCard from '../../components/AssistCard';
-import firestore from '@react-native-firebase/firestore';
-import { IFirestoreSupportGroup } from '../../types/SupportGroup';
 import { Picker } from '@react-native-picker/picker';
 import Header from '../../components/header/Header';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { GrupoApiService, Grupo } from '../../services/GrupoApiService';
 
 type SupportGroupMenuScreenNavProp = StackNavigationProp<RootStackParamList, 'SupportGroupMenu'>;
 
@@ -21,7 +20,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupMenuScreenNavProp>();
   const { user } = useUser();
   const { supportGroup, setSupportGroup } = useSupportGroup()
-  const [groups, setGroups] = useState<IFirestoreSupportGroup[]>([]);
+  const [groups, setGroups] = useState<Grupo[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<string>('recentFirst');
   const { getPendingNotificationCounts } = useNotifications();
@@ -29,42 +28,37 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
   const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
 
   const fetchGroups = async () => {
-    if (!user?.uid) {
-      console.log("🚫 Error: Usuario no autenticado");
-      setErrorMessage("Error: Usuario no autenticado.");
+    console.log("🔄 Fetching groups for user:", user);
+    if (!user?.user_id) {
+      console.log("🚫 Error: Usuario no autenticado screen");
+      setErrorMessage("Error: Usuario no autenticado screen.");
       return;
     }
 
     try {
-      const querySnapshot = await firestore()
-        .collection('Grupos')
-        .where('miembros', 'array-contains', user.uid)
-        .get();
-
-      const fetchedGroups: IFirestoreSupportGroup[] = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as IFirestoreSupportGroup[];
-
+      console.log("🔍 Obteniendo grupos para el auxiliar con ID:", user.user_id);
+      const fetchedGroups = await GrupoApiService.getByAuxiliar(user.user_id);
+console.log("🔍 Grupos obtenidos:", fetchedGroups.map(g => g.nombre_paciente));
       const sortedGroups = sortGroups(fetchedGroups, sortOption);
+      console.log("🔍 Grupos ordenados:", sortedGroups.map(g => g.nombre_paciente));
       setGroups(sortedGroups);
-      console.log("🎭 Grupos obtenidos correctamente y ordenados:", sortedGroups.map(sg => sg.nombreAsistido));
+      console.log("🎭 Grupos obtenidos correctamente y ordenados:", sortedGroups.map(sg => sg.nombre_paciente));
     } catch (error) {
       console.error("🚫 Error al obtener los grupos:", error);
       setErrorMessage("Error al cargar los grupos.");
     }
   };
 
-  const sortGroups = (groups: IFirestoreSupportGroup[], option: string) => {
+  const sortGroups = (groups: Grupo[], option: string) => {
     switch (option) {
       case 'nameAZ':
-        return groups.sort((a, b) => a.nombreAsistido.localeCompare(b.nombreAsistido));
+        return groups.sort((a, b) => a.nombre_paciente.localeCompare(b.nombre_paciente));
       case 'nameZA':
-        return groups.sort((a, b) => b.nombreAsistido.localeCompare(a.nombreAsistido));
+        return groups.sort((a, b) => b.nombre_paciente.localeCompare(a.nombre_paciente));
       case 'recentFirst':
-        return groups.sort((a, b) => (b.fechaCreacion?.seconds || 0) - (a.fechaCreacion?.seconds || 0));
+        return groups.sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime());
       case 'oldestFirst':
-        return groups.sort((a, b) => (a.fechaCreacion?.seconds || 0) - (b.fechaCreacion?.seconds || 0));
+        return groups.sort((a, b) => new Date(a.fecha_creacion).getTime() - new Date(b.fecha_creacion).getTime());
       default:
         return groups;
     }
@@ -76,7 +70,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
         await fetchGroups(); // actualiza `groups`
       };
       loadGroupsAndCounts();
-    }, [user?.uid, sortOption])
+    }, [user?.user_id, sortOption])
   );
   
   useEffect(() => {
@@ -96,8 +90,8 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
     navigation.navigate('CreateGroup');
   };
 
-  const handleClickGroup = (group: IFirestoreSupportGroup) => {
-    console.log(`🟢 Navegando a la Home del Grupo "${group.id}" (${group.nombreAsistido})`);
+  const handleClickGroup = (group: Grupo) => {
+    console.log(`🟢 Navegando a la Home del Grupo "${group.id}" (${group.nombre_paciente})`);
     setSupportGroup(group)
     navigation.navigate('SupportGroupHome');
   };

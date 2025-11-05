@@ -1,7 +1,7 @@
 const BASE_URL = 'http://10.0.2.2:3000/api/pictogramas';
 
 export interface Pictograma {
-  id: number;
+  id: string;
   nombre: string;
   imagen_url?: string | null;
   categoria_id: number;
@@ -17,7 +17,7 @@ export const PictogramaApiService = {
     return res.json();
   },
 
-  async getById(id: number): Promise<Pictograma> {
+  async getById(id: string): Promise<Pictograma> {
     const res = await fetch(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Pictograma no encontrado');
     return res.json();
@@ -41,7 +41,7 @@ export const PictogramaApiService = {
     return data;
   },
 
-  async update(id: number, pictograma: Partial<Pictograma>): Promise<Pictograma> {
+  async update(id: string, pictograma: Partial<Pictograma>): Promise<Pictograma> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

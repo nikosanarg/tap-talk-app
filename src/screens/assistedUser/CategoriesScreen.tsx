@@ -88,7 +88,7 @@ const CategoriesScreen = () => {
   return (
     <SafeAreaView>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <AssistedUserHeader assistedUserName={supportGroup.nombreAsistido} />
+        <AssistedUserHeader assistedUserName={supportGroup.nombre_paciente} />
 
         <CategoriesScreenContainer>
           <StyledCategoriesContainer>

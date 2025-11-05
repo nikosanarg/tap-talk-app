@@ -1,17 +1,17 @@
-import { Timestamp } from "@react-native-firebase/firestore";
+export interface IFirestoreSupportMember {
+  id: string;
+  nombre: string;
+}
 
+// Esta interfaz ya no se usa, usar Grupo de GrupoApiService en su lugar
+// La mantenemos por compatibilidad mientras se completa la migración
 export interface IFirestoreSupportGroup {
   id: string;
   activo: boolean;
-  codigoInvitacion: string[16];
-  creadorId: string;
-  fechaCreacion: Timestamp;
-  miembros: string[];
-  nombreAsistido: string;
+  codigo_vinculacion: string;
+  creador_id: string;
+  fecha_creacion: string;
+  miembros?: string[];
+  nombre_paciente: string;
   pictogramasPersonalizados?: string[];
-}
-
-export interface IFirestoreSupportMember {
-  id: string
-  nombre: string
 }

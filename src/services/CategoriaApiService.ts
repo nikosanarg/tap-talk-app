@@ -1,7 +1,8 @@
-const BASE_URL = 'http://10.0.2.2:3000/api/categorias';
+import { config } from '../config/config';
+const BASE_URL = `${config.API_URL}/api/categorias`;
 
 export interface Categoria {
-  id: number;          // autoincremental
+  id: string;          // alfanumérico de Supabase
   nombre: string;       // obligatorio
   imagen?: string;      // opcional
   color?: string;       // default "000000"
@@ -9,12 +10,30 @@ export interface Categoria {
 
 export const CategoriaApiService = {
   async getAll(): Promise<Categoria[]> {
-    const res = await fetch(BASE_URL);
-    if (!res.ok) throw new Error('Error al obtener categorías');
+    const session = await fetch(`${config.API_URL}/api/auth/session`);
+    const sessionData = await session.json();
+
+    if (!sessionData.success || !sessionData.session?.access_token) {
+      throw new Error('Usuario no autenticado api service');
+    }
+
+    const res = await fetch(BASE_URL, {
+      headers: {
+        'Authorization': `Bearer ${sessionData.session.access_token}`
+      }
+    });
+    
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error('Usuario no autenticado api service - 401');
+      }
+      throw new Error('Error al obtener categorías');
+    }
+    
     return res.json();
   },
 
-  async getById(id: number): Promise<Categoria> {
+  async getById(id: string): Promise<Categoria> {
     const res = await fetch(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Categoría no encontrada');
     return res.json();
@@ -38,7 +57,7 @@ export const CategoriaApiService = {
     return data;
   },
 
-  async update(id: number, categoria: Partial<Categoria>): Promise<Categoria> {
+  async update(id: string, categoria: Partial<Categoria>): Promise<Categoria> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

@@ -1,29 +1,51 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { IFirestoreUser } from '../types/User';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ISupabaseUser } from '../types/User';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthService } from '../services/AuthService';
 
 interface UserContextType {
-  user: IFirestoreUser | null;
-  setUser: React.Dispatch<React.SetStateAction<IFirestoreUser | null>>;
-  handleLogout: () => void;
+  user: ISupabaseUser | null;
+  setUser: React.Dispatch<React.SetStateAction<ISupabaseUser | null>>;
+  handleLogout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<IFirestoreUser | null>(null);
+  const [user, setUser] = useState<ISupabaseUser | null>(null);
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
+  // Verificar sesión al iniciar
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const currentUser = await AuthService.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+
+    checkSession();
+  }, []);
+
   const handleLogout = async () => {
-    setUser(null);
-    await AsyncStorage.removeItem('groupId');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'RoleSelection' }],
-    });
+    try {
+      await AuthService.logoutUser();
+      setUser(null);
+      await AsyncStorage.removeItem('groupId');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'RoleSelection' }],
+      });
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
@@ -35,7 +57,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;

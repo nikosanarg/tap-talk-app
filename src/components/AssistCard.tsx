@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { GroupActionRightIcon, GroupCard, GroupSubtitle, GroupTextContainer, GroupTitle, StyledBadgeContainer, StyledBadgeText } from '../styles/assistCard';
-import { IFirestoreSupportGroup, IFirestoreSupportMember } from '../types/SupportGroup';
+import { IFirestoreSupportMember } from '../types/SupportGroup';
+import { Grupo } from '../services/GrupoApiService';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSupportGroup } from '../contexts/SupportGroupContext';
 
 interface IAssistCardProps {
-  group?: IFirestoreSupportGroup;
+  group?: Grupo;
   member?: Partial<IFirestoreSupportMember>;
   pendingCount: number;
   callback: () => void
@@ -18,7 +19,7 @@ const AssistCard = ({ group, member, callback, pendingCount }: IAssistCardProps)
   return (
     <GroupCard onPress={callback}>
       <GroupTextContainer>
-        <GroupTitle>👤 {group?.nombreAsistido ?? member?.nombre}</GroupTitle>
+        <GroupTitle>👤 {group?.nombre_paciente ?? member?.nombre}</GroupTitle>
       </GroupTextContainer>
       {pendingCount > 0 && (
         <StyledBadgeContainer>
@@ -26,7 +27,7 @@ const AssistCard = ({ group, member, callback, pendingCount }: IAssistCardProps)
         </StyledBadgeContainer>
       )}
       {member
-        ? member.id === supportGroup?.creadorId ? <></> : <TouchableOpacity onPress={callback}><Icon name="trash-bin" size={32} color="#E05154" /></TouchableOpacity>
+        ? member.id === supportGroup?.creador_id ? <></> : <TouchableOpacity onPress={callback}><Icon name="trash-bin" size={32} color="#E05154" /></TouchableOpacity>
         : <GroupActionRightIcon onPress={callback}>➲</GroupActionRightIcon>
       }
     </GroupCard>

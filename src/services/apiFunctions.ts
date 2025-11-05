@@ -1,31 +1,38 @@
-import { FirestoreApiService } from '../services/FirestoreApiService'
 import { AuthService } from './AuthService'
+import { AuxiliarApiService } from './AuxiliarApiService'
+import { CategoriaApiService } from './CategoriaApiService'
+import { GrupoApiService } from './GrupoApiService'
+import { PictogramaApiService } from './PictogramaApiService'
+import { NotificationApiService } from './NotificationApiService'
 
 export const apiFunctions: Record<string, Function> = {
+  // Auth functions - mantienen Firebase
   registerUser: AuthService.registerUser,
   loginUser: AuthService.loginUser,
   logoutUser: AuthService.logoutUser,
   getCurrentUser: AuthService.getCurrentUser,
   resetPassword: AuthService.resetPassword,
 
-  getUser: FirestoreApiService.getUser,
-  createUser: FirestoreApiService.createUser,
-  updateUser: FirestoreApiService.updateUser,
-  deleteUser: FirestoreApiService.deleteUser,
+  // User functions
+  getUser: AuxiliarApiService.getById,
+  createUser: AuxiliarApiService.create,
+  updateUser: AuxiliarApiService.update,
 
-  getCategories: FirestoreApiService.getCategories,
-  getCategory: FirestoreApiService.getCategory,
-  createCategory: FirestoreApiService.createCategory,
-  updateCategory: FirestoreApiService.updateCategory,
-  deleteCategory: FirestoreApiService.deleteCategory,
+  // Category functions
+  getCategories: CategoriaApiService.getAll,
+  getCategory: CategoriaApiService.getById,
 
-  getSupportGroups: FirestoreApiService.getSupportGroups,
-  createSupportGroup: FirestoreApiService.createSupportGroup,
-  updateSupportGroup: FirestoreApiService.updateSupportGroup,
-  deleteSupportGroup: FirestoreApiService.deleteSupportGroup,
+  // Support group functions
+  getSupportGroups: GrupoApiService.getByAuxiliar,
+  createSupportGroup: GrupoApiService.create,
+  updateSupportGroup: GrupoApiService.update,
 
-  getPictograms: FirestoreApiService.getPictograms,
-  createPictogram: FirestoreApiService.createPictogram,
-  updatePictogram: FirestoreApiService.updatePictogram,
-  deletePictogram: FirestoreApiService.deletePictogram,
+  // Pictogram functions
+  getPictograms: PictogramaApiService.getAll,
+  createPictogram: PictogramaApiService.create,
+  updatePictogram: PictogramaApiService.update,
+
+  // Notification functions
+  createNotification: NotificationApiService.create,
+  getNotifications: NotificationApiService.getAll,
 }
