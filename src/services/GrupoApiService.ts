@@ -1,4 +1,5 @@
 import { config } from '../config/config';
+import { apiClient } from '../utils/apiClient';
 
 export const BASE_URL = `${config.API_URL}/api/grupos`;
 
@@ -6,6 +7,15 @@ interface Miembro {
   id: string;
   nombre: string;
   pendingCount?: number;
+}
+
+export interface AuxiliarGrupo {
+  id: string;
+  user_id: string;
+  grupo_id: number;
+  es_administrador: boolean;
+  fecha_vinculacion: string;
+  nombre?: string; // Agregado del JOIN con auxiliar
 }
 
 export interface Grupo {
@@ -23,13 +33,13 @@ export interface Grupo {
 
 export const GrupoApiService = {
   async getAll(): Promise<Grupo[]> {
-    const res = await fetch(BASE_URL);
+    const res = await apiClient.get(BASE_URL);
     if (!res.ok) throw new Error('Error al obtener grupos');
     return res.json();
   },
 
-  async getById(id: string): Promise<Grupo> {
-    const res = await fetch(`${BASE_URL}/${id}`);
+  async getById(id: number): Promise<Grupo> {
+    const res = await apiClient.get(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Grupo no encontrado');
     return res.json();
   },
@@ -58,7 +68,7 @@ export const GrupoApiService = {
     return data;
   },
 
-  async update(id: string, grupo: Partial<Grupo>): Promise<Grupo> {
+  async update(id: number, grupo: Partial<Grupo>): Promise<Grupo> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -69,6 +79,22 @@ export const GrupoApiService = {
       const errorText = await res.text();
       console.error('❌ [APP] Error al actualizar grupo:', errorText);
       throw new Error('Error al actualizar grupo');
+    }
+
+    return res.json();
+  },
+
+  async getByCodigo(codigoVinculacion: string): Promise<Grupo | null> {
+    const res = await fetch(`${BASE_URL}/codigo/${codigoVinculacion}`);
+    
+    if (res.status === 404) {
+      return null; // Grupo no encontrado
+    }
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('❌ [APP] Error al buscar grupo por código:', errorText);
+      throw new Error('Error al buscar grupo');
     }
 
     return res.json();

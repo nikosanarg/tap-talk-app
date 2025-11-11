@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { IFirestoreSupportMember } from '../types/SupportGroup';
-import { Grupo, GrupoApiService, BASE_URL } from '../services/GrupoApiService';
+import { Grupo, GrupoApiService, BASE_URL, AuxiliarGrupo } from '../services/GrupoApiService';
 import { AuxiliarApiService, Auxiliar } from '../services/AuxiliarApiService';
 
 interface SupportGroupContextType {
@@ -8,9 +7,9 @@ interface SupportGroupContextType {
   fetchGroupByCode: (groupCode: string) => Promise<Grupo | null>;
 
   setSupportGroup: React.Dispatch<React.SetStateAction<Grupo | null>>;
-  deleteGroupById: (groupId: string) => Promise<void>;
-  updateGroupName: (groupId: string, newName: string) => Promise<void>;
-  removeGroupMember: (groupId: string, memberId: string) => Promise<void>;
+  deleteGroupById: (groupId: number) => Promise<void>;
+  updateGroupName: (groupId: number, newName: string) => Promise<void>;
+  removeGroupMember: (groupId: number, memberId: string) => Promise<void>;
 }
 
 const SupportGroupContext = createContext<SupportGroupContextType | undefined>(undefined);
@@ -38,7 +37,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
 
 
 
-  const deleteGroupById = async (groupId: string): Promise<void> => {
+  const deleteGroupById = async (groupId: number): Promise<void> => {
     try {
       console.warn('deleteGroupById no está implementado en la API');
       console.log(`🚮 Intento de eliminar Grupo ${groupId}`);
@@ -51,7 +50,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateGroupName = async (groupId: string, newName: string): Promise<void> => {
+  const updateGroupName = async (groupId: number, newName: string): Promise<void> => {
     try {
       await GrupoApiService.update(groupId, { nombre_paciente: newName });
       console.log(`✅ Nombre del paciente actualizado a: ${newName}`);
@@ -61,7 +60,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const removeGroupMember = async (groupId: string, memberId: string): Promise<void> => {
+  const removeGroupMember = async (groupId: number, memberId: string): Promise<void> => {
     try {
       const res = await fetch(`${BASE_URL}/${groupId}/auxiliares/${memberId}`, {
         method: 'DELETE',

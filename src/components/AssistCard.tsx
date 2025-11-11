@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { GroupActionRightIcon, GroupCard, GroupSubtitle, GroupTextContainer, GroupTitle, StyledBadgeContainer, StyledBadgeText } from '../styles/assistCard';
-import { IFirestoreSupportMember } from '../types/SupportGroup';
+import { AuxiliarGrupo } from '../services/GrupoApiService';
 import { Grupo } from '../services/GrupoApiService';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -8,7 +8,7 @@ import { useSupportGroup } from '../contexts/SupportGroupContext';
 
 interface IAssistCardProps {
   group?: Grupo;
-  member?: Partial<IFirestoreSupportMember>;
+  member?: Partial<AuxiliarGrupo>;
   pendingCount: number;
   callback: () => void
 }

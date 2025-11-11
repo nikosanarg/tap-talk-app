@@ -25,7 +25,7 @@ const SupportGroupMenuScreen = (): React.JSX.Element => {
   const [sortOption, setSortOption] = useState<string>('recentFirst');
   const { getPendingNotificationCounts } = useNotifications();
 
-  const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
+  const [pendingCounts, setPendingCounts] = useState<Record<number, number>>({});
 
   const fetchGroups = async () => {
     console.log("🔄 Fetching groups for user:", user);

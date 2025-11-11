@@ -1,12 +1,16 @@
 import { ISupabaseUser } from '../types/User';
 import { config } from '../config/config';
 import { testApiConnection } from '../utils/networkTest';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AuthResponse {
   success: boolean;
   user?: ISupabaseUser;
   error?: string;
-  session?: any;
+  session?: {
+    access_token: string;
+    refresh_token: string;
+  };
 }
 
 export const AuthService = {
@@ -55,12 +59,12 @@ export const AuthService = {
 
   loginUser: async (email: string, password: string): Promise<ISupabaseUser> => {
     try {
-      console.log('Attempting login with URL:', `${config.API_URL}/api/auth/login`);
       const response = await fetch(`${config.API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
@@ -68,6 +72,11 @@ export const AuthService = {
       
       if (!data.success || !data.user) {
         throw new Error(data.error || 'Error durante el inicio de sesión');
+      }
+
+      // Guardar el access_token en AsyncStorage
+      if (data.session?.access_token) {
+        await AsyncStorage.setItem('supabase_token', data.session.access_token);
       }
 
       return data.user;
@@ -78,7 +87,10 @@ export const AuthService = {
 
   logoutUser: async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/logout', {
+      // Eliminar el token local
+      await AsyncStorage.removeItem('supabase_token');
+      
+      const response = await fetch(`${config.API_URL}/api/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

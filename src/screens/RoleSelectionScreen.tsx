@@ -7,12 +7,11 @@ import { ScreenView, TextView, TitleText } from '../styles/common';
 import { AssistedUserRoleButton, StyledContextualView } from '../styles/auth';
 import { ButtonText, LinkButton } from '../styles/buttons';
 import { StackNavigationProp } from '@react-navigation/stack';
-import firestore from '@react-native-firebase/firestore';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useCategories } from '../contexts/CategoriesContext';
 import { useSupportGroup } from '../contexts/SupportGroupContext';
 import { useBackendIp } from '../contexts/BackendIpContext';
-import { IFirestoreSupportGroup } from '../types/SupportGroup';
+import { GrupoApiService } from '../services/GrupoApiService';
 
 type RoleSelectionScreenNavProp = StackNavigationProp<RootStackParamList, 'RoleSelection'>;
 
@@ -28,31 +27,37 @@ function RoleSelectionScreen(): React.JSX.Element {
     const checkGroupId = async () => {
       const groupId = await AsyncStorage.getItem('groupId');
       if (groupId) {
-        const groupDoc = await firestore().collection('Grupos').doc(groupId).get();
-        if (groupDoc.exists && groupDoc.data()) {
-          const data = groupDoc.data();
-          const groupData: IFirestoreSupportGroup = {
-            id: groupId,
-            activo: data?.activo,
-            codigoInvitacion: data?.codigoInvitacion,
-            creadorId: data?.creadorId,
-            fechaCreacion: data?.fechaCreacion,
-            miembros: data?.miembros,
-            nombreAsistido: data?.nombreAsistido
-          };
-          setSupportGroup(groupData);
-          const initStatus = await initCategoriesAndPictograms();
+        try {
+          const group = await GrupoApiService.getById(parseInt(groupId));
+          if (group) {
+            setSupportGroup(group);
+            const initStatus = await initCategoriesAndPictograms();
 
-          if (initStatus) {
-            navigation.navigate('Categories');
+            if (initStatus) {
+              navigation.navigate('Categories');
+            } else {
+              console.warn("La IP del backend aún no está disponible.");
+            }
+            setInitialized(true);
           } else {
-            console.warn("La IP del backend aún no está disponible.");
+            console.error('🚫 Error: el grupo ya no existe');
+            await AsyncStorage.removeItem('groupId');
           }
-          setInitialized(true)
-        } else {
-          console.error('🚫 Error: el grupo ya no existe');
-          await AsyncStorage.removeItem('groupId');
+        } catch (error: any) {
+          console.error('🚫 Error al obtener el grupo:', error);
+          
+          // Si es error de autenticación, limpiar datos y permitir selección de rol
+          if (error.message === 'UNAUTHORIZED') {
+            console.log('🔄 Sesión expirada, limpiando datos locales');
+            await AsyncStorage.removeItem('groupId');
+            setInitialized(true); // Permitir que se muestre la pantalla de selección de rol
+          } else {
+            await AsyncStorage.removeItem('groupId');
+          }
         }
+      } else {
+        // No hay groupId guardado, mostrar pantalla de selección
+        setInitialized(true);
       }
     };
     checkGroupId();

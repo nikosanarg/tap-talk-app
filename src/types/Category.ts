@@ -1,10 +1,10 @@
 import { IPictogram } from "./Pictogram";
 
 export interface ICategory {
-  id: number;           // SERIAL PRIMARY KEY
-  nombre: string;       // VARCHAR(100) NOT NULL
-  imagen?: string;      // VARCHAR(255) - nullable
-  color: string;        // VARCHAR(10) NOT NULL DEFAULT '000000'
+  id: number;                // SERIAL PRIMARY KEY
+  nombre: string;            // VARCHAR(100) NOT NULL
+  imagen?: string | null;    // VARCHAR(255) - nullable
+  color?: string;            // VARCHAR(10) DEFAULT '#000000'
 }
 
 export interface CategoriesContextType {

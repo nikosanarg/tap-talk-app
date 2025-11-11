@@ -6,12 +6,11 @@ import { PictogramaApiService } from './PictogramaApiService'
 import { NotificationApiService } from './NotificationApiService'
 
 export const apiFunctions: Record<string, Function> = {
-  // Auth functions - mantienen Firebase
+  // Auth functions - usando Supabase
   registerUser: AuthService.registerUser,
   loginUser: AuthService.loginUser,
   logoutUser: AuthService.logoutUser,
   getCurrentUser: AuthService.getCurrentUser,
-  resetPassword: AuthService.resetPassword,
 
   // User functions
   getUser: AuxiliarApiService.getById,

@@ -3,12 +3,11 @@ import { Modal, Text, TouchableOpacity, View } from 'react-native'
 import { INotification } from '../../types/Notification'
 import Icon from 'react-native-vector-icons/Ionicons';
 import { NotificationCardContainer, NotificationCategoryIcon, NotificationCategoryLabel, NotificationCategorySubtitle, NotificationCategoryTitle } from './styled';
-import { formatSinceTimeToHumanRead } from '../../utils/formatHour';
 import { getCategoryColor } from '../../utils/getCategoryColor';
-import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { useCategories } from '../../contexts/CategoriesContext';
+import { NotificationApiService } from '../../services/NotificationApiService';
 
 interface NotificationCardProps {
   notification: INotification
@@ -27,16 +26,11 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
     setModalVisible(true);
   };
 
-  const handleMarkAsResolved = async (notificationId?: string) => {
-    if (!notificationId) {
-      console.error("🚫 La notificación no tenía un ID de firestore");
-      setModalVisible(false);
-      return
-    }
+  const handleMarkAsResolved = async (notificationId: number) => {
     try {
-      await firestore().collection('Notificaciones').doc(notificationId).update({
-        miembroResolutor: user?.uid || 'anonimo',
-        fechaResuelta: firestore.FieldValue.serverTimestamp(),
+      await NotificationApiService.update(notificationId, {
+        miembro_resolutor: user?.user_id || 'anonimo',
+        fecha_resuelta: new Date().toISOString(),
       });
       console.log(`✅ Notificación ${notificationId} marcada como resuelta`);
       await fetchNotifications();
@@ -56,13 +50,17 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
       <View style={{ flex: 1 }}>
         <NotificationCategoryTitle>{notification.titulo}</NotificationCategoryTitle>
         <NotificationCategorySubtitle>
-          {notification.fechaCreacion instanceof firestore.Timestamp
-            ? formatSinceTimeToHumanRead(notification.fechaCreacion)
-            : 'Fecha desconocida'}
+          {new Date(notification.fecha_creacion).toLocaleString('es-AR', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })}
         </NotificationCategorySubtitle>
       </View>
 
-      {notification.miembroResolutor ? (
+      {notification.miembro_resolutor ? (
         <Icon name="checkmark-circle" style={{ margin: 6 }} size={32} color="green" />
       ) : (
         <Icon name="ellipse-outline" style={{ margin: 6 }} size={32} color="gray" />

@@ -1,7 +1,5 @@
-import { Timestamp } from "@react-native-firebase/firestore";
-
-export const formatSinceTimeToHumanRead = (date: Timestamp) => {
-  const dateInMs = date.toMillis(); 
+export const formatSinceTimeToHumanRead = (dateString: string) => {
+  const dateInMs = new Date(dateString).getTime(); 
   const currentDate = Date.now()
   const diff = currentDate - dateInMs
   const minutes = Math.floor(diff / (60 * 1000))

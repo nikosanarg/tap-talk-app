@@ -7,7 +7,7 @@ import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTe
 import { ScreenView } from '../../styles/common';
 import ReturnButton from '../../components/returnButton/ReturnButton';
 import { useSupportGroup } from '../../contexts/SupportGroupContext';
-import { IFirestoreSupportGroup } from '../../types/SupportGroup';
+import { Grupo } from '../../services/GrupoApiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LinkScreenNavProp = StackNavigationProp<RootStackParamList, 'Link'>;
@@ -29,7 +29,7 @@ function LinkScreen(): React.JSX.Element {
       }
   
       try {
-        await AsyncStorage.setItem('groupId', groupData.id);
+        await AsyncStorage.setItem('groupId', String(groupData.id));
         console.log(`📥 Grupo descargado y almacenado en el Storage`);
       } catch (error) {
         console.error(`🚫 Error guardando el grupo vinculado`);

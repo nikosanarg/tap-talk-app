@@ -1,23 +1,25 @@
-const BASE_URL = 'http://10.0.2.2:3000/api/pictogramas';
+import { config } from '../config/config';
+import { apiClient } from '../utils/apiClient';
+const BASE_URL = `${config.API_URL}/api/pictogramas`;
 
 export interface Pictograma {
-  id: string;
+  id: number;               // SERIAL en BD
   nombre: string;
-  imagen_url?: string | null;
-  categoria_id: number;
-  activo: boolean;           // default true en BD
+  imagen_url?: string | null;   // columna 'imagen_url' en BD
+  categoria_id?: number | null;
+  activo?: boolean;         // default true en BD
   icono?: string | null;
-  usos: number;              // default 0 en BD
+  usos?: number;            // default 0 en BD
 }
 
 export const PictogramaApiService = {
   async getAll(): Promise<Pictograma[]> {
-    const res = await fetch(BASE_URL);
+    const res = await apiClient.get(BASE_URL);
     if (!res.ok) throw new Error('Error al obtener pictogramas');
     return res.json();
   },
 
-  async getById(id: string): Promise<Pictograma> {
+  async getById(id: number): Promise<Pictograma> {
     const res = await fetch(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Pictograma no encontrado');
     return res.json();
@@ -41,7 +43,7 @@ export const PictogramaApiService = {
     return data;
   },
 
-  async update(id: string, pictograma: Partial<Pictograma>): Promise<Pictograma> {
+  async update(id: number, pictograma: Partial<Pictograma>): Promise<Pictograma> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

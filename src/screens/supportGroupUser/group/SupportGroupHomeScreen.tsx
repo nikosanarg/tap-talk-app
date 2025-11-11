@@ -28,7 +28,7 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
   useEffect(() => {
     if (user && supportGroup) {
-      setIsAdmin(user.uid === supportGroup.creador_id);
+      setIsAdmin(user.user_id === supportGroup.creador_id);
     }
   }, [user, supportGroup]);
 

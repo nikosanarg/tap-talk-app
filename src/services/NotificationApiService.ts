@@ -1,31 +1,32 @@
-//const BASE_URL = 'http://10.0.2.2:3000/api/notificaciones';
-const BASE_URL = 'http://192.168.1.37:3000/api/notificaciones';  //ESTO FUE POR USAR EL CELULAR DE EMULADOR
+import { config } from '../config/config';
+import { apiClient } from '../utils/apiClient';
+const BASE_URL = `${config.API_URL}/api/notificaciones`;
 
 export interface Notification {
-  id: string;
+  id: number;                           // SERIAL en BD
   pictograma_id: number;
   titulo: string;
   categoria: string;
-  fecha_creacion: string;
+  fecha_creacion: string;               // timestamp en BD
   grupo_id: number;
-  fecha_resuelta: string | null;
-  miembro_resolutor: string | null;
+  fecha_resuelta?: string | null;       // timestamp nullable en BD
+  miembro_resolutor?: string | null;    // VARCHAR nullable en BD
 }
 
 export const NotificationApiService = {
   async getAll(): Promise<Notification[]> {
-    const res = await fetch(BASE_URL);
+    const res = await apiClient.get(BASE_URL);
     if (!res.ok) throw new Error('Error al obtener notificaciones');
     return res.json();
   },
 
-  async getById(id: string): Promise<Notification> {
-    const res = await fetch(`${BASE_URL}/${id}`);
+  async getById(id: number): Promise<Notification> {
+    const res = await apiClient.get(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Notificación no encontrada');
     return res.json();
   },
 
-  async create(notification: Notification): Promise<Notification> {
+  async create(notification: Omit<Notification, 'id'>): Promise<Notification> {
     const res = await fetch(BASE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,7 +45,7 @@ export const NotificationApiService = {
     return data;
   },
 
-  async update(id: string, notification: Notification): Promise<Notification> {
+  async update(id: number, notification: Partial<Notification>): Promise<Notification> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -54,7 +55,7 @@ export const NotificationApiService = {
     return res.json();
   },
 
-  async remove(id: string): Promise<{ mensaje: string; notificacion: Notification }> {
+  async remove(id: number): Promise<{ mensaje: string; notificacion: Notification }> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
     });
