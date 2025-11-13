@@ -20,6 +20,10 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [groupName, setGroupName] = useState(supportGroup?.nombre_paciente || '');
 
+  console.log('🔍 [EDIT] supportGroup:', JSON.stringify(supportGroup, null, 2));
+  console.log('🔍 [EDIT] supportGroup.miembros:', supportGroup?.miembros);
+  console.log('🔍 [EDIT] miembros length:', supportGroup?.miembros?.length);
+
   const handleRemoveMember = async (memberId: string) => {
     try {
       if (supportGroup?.id) {
@@ -76,9 +80,20 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
   };
 
   const confirmDeleteGroup = () => {
+    const memberCount = supportGroup?.miembros?.length || 0;
+    const hasMultipleMembers = memberCount > 1;
+    
+    const title = hasMultipleMembers 
+      ? "⚠️ Grupo con múltiples miembros" 
+      : "Confirmar eliminación";
+    
+    const message = hasMultipleMembers
+      ? `Este grupo tiene ${memberCount} miembros. Si lo eliminas, todos los miembros perderán acceso al grupo de ${supportGroup?.nombre_paciente}.\n\n¿Estás seguro de que deseas continuar? Esta acción es permanente e irreversible.`
+      : `¿Estás seguro de que deseas eliminar el grupo de ${supportGroup?.nombre_paciente}? Esta acción es permanente e irreversible.`;
+    
     Alert.alert(
-      "Confirmar eliminación",
-      `¿Estás seguro de que deseas eliminar el grupo de ${supportGroup?.nombre_paciente}? Esta acción es permanente e irreversible.`,
+      title,
+      message,
       [
         { text: "Cancelar", style: "cancel" },
         { text: "Eliminar", style: "destructive", onPress: handleDeleteGroup },

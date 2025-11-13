@@ -58,9 +58,10 @@ export const GrupoApiService = {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error('❌ [APP] Error al crear grupo:', errorText);
-      throw new Error('Error al crear grupo');
+      const errorData = await res.json().catch(() => ({ error: 'Error desconocido' }));
+      const errorMessage = errorData.error || 'Error al crear grupo';
+      console.error('❌ [APP] Error al crear grupo:', errorMessage);
+      throw new Error(errorMessage);
     }
 
     const data = await res.json();
@@ -69,11 +70,7 @@ export const GrupoApiService = {
   },
 
   async update(id: number, grupo: Partial<Grupo>): Promise<Grupo> {
-    const res = await fetch(`${BASE_URL}/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(grupo),
-    });
+    const res = await apiClient.put(`${BASE_URL}/${id}`, grupo);
 
     if (!res.ok) {
       const errorText = await res.text();
@@ -81,7 +78,23 @@ export const GrupoApiService = {
       throw new Error('Error al actualizar grupo');
     }
 
-    return res.json();
+    const data = await res.json();
+    console.log('✅ [APP] Grupo actualizado:', data);
+    return data;
+  },
+
+  async delete(id: number): Promise<{ mensaje: string; grupo: Grupo }> {
+    const res = await apiClient.delete(`${BASE_URL}/${id}`);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('❌ [APP] Error al eliminar grupo:', errorText);
+      throw new Error('Error al eliminar grupo');
+    }
+
+    const data = await res.json();
+    console.log('✅ [APP] Grupo eliminado:', data);
+    return data;
   },
 
   async getByCodigo(codigoVinculacion: string): Promise<Grupo | null> {

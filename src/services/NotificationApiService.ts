@@ -1,32 +1,22 @@
 import { config } from '../config/config';
 import { apiClient } from '../utils/apiClient';
+import { INotification } from '../types/Notification';
 const BASE_URL = `${config.API_URL}/api/notificaciones`;
 
-export interface Notification {
-  id: number;                           // SERIAL en BD
-  pictograma_id: number;
-  titulo: string;
-  categoria: string;
-  fecha_creacion: string;               // timestamp en BD
-  grupo_id: number;
-  fecha_resuelta?: string | null;       // timestamp nullable en BD
-  miembro_resolutor?: string | null;    // VARCHAR nullable en BD
-}
-
 export const NotificationApiService = {
-  async getAll(): Promise<Notification[]> {
+  async getAll(): Promise<INotification[]> {
     const res = await apiClient.get(BASE_URL);
     if (!res.ok) throw new Error('Error al obtener notificaciones');
     return res.json();
   },
 
-  async getById(id: number): Promise<Notification> {
+  async getById(id: number): Promise<INotification> {
     const res = await apiClient.get(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Notificación no encontrada');
     return res.json();
   },
 
-  async create(notification: Omit<Notification, 'id'>): Promise<Notification> {
+  async create(notification: Omit<INotification, 'id'>): Promise<INotification> {
     const res = await fetch(BASE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -45,7 +35,7 @@ export const NotificationApiService = {
     return data;
   },
 
-  async update(id: number, notification: Partial<Notification>): Promise<Notification> {
+  async update(id: number, notification: Partial<INotification>): Promise<INotification> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -55,7 +45,7 @@ export const NotificationApiService = {
     return res.json();
   },
 
-  async remove(id: number): Promise<{ mensaje: string; notificacion: Notification }> {
+  async remove(id: number): Promise<{ mensaje: string; notificacion: INotification }> {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
     });

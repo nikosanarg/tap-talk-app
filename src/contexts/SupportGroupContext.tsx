@@ -19,8 +19,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchGroupByCode = async (groupCode: string): Promise<Grupo | null> => {
     try {
-      const groups = await GrupoApiService.getAll();
-      const group = groups.find(g => g.codigo_vinculacion === groupCode);
+      const group = await GrupoApiService.getByCodigo(groupCode);
       
       if (!group) {
         console.log("🌵 No se encontró el grupo.");
@@ -39,8 +38,10 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteGroupById = async (groupId: number): Promise<void> => {
     try {
-      console.warn('deleteGroupById no está implementado en la API');
-      console.log(`🚮 Intento de eliminar Grupo ${groupId}`);
+      console.log(`🚮 Eliminando Grupo ${groupId}`);
+      await GrupoApiService.delete(groupId);
+      console.log(`✅ Grupo ${groupId} eliminado correctamente`);
+      
       if (supportGroup?.id === groupId) {
         setSupportGroup(null);
       }
@@ -68,7 +69,7 @@ export const SupportGroupProvider = ({ children }: { children: ReactNode }) => {
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('� Error al eliminar miembro:', errorText);
+        console.error('❌ Error al eliminar miembro:', errorText);
         throw new Error('No se pudo eliminar el miembro del grupo');
       }
 

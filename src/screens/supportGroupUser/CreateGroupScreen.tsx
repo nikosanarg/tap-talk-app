@@ -29,22 +29,34 @@ function CreateGroupScreen(): React.JSX.Element {
       return
     }
 
+    if (!assistedUserName.trim()) {
+      setErrorMessage('Por favor, ingresa el nombre del usuario asistido');
+      return;
+    }
+
     console.log(`🟣 Iniciando Creación de Grupo: assistedUser=${assistedUserName} | creadorId=${user.user_id}`);
   
     try {
       // Crear el grupo usando directamente el user_id (UUID)
       const nuevoGrupo = await GrupoApiService.create({
         creador_id: user.user_id, // Pasamos el UUID directamente
-        nombre_paciente: assistedUserName,
+        nombre_paciente: assistedUserName.trim(),
         codigo_vinculacion: '', // Se genera en el backend
         fecha_creacion: new Date().toISOString()
       });
   
       console.log(`✅ Grupo creado exitosamente:`, nuevoGrupo);
+      setErrorMessage('');
       navigation.navigate('SupportGroupMenu');
-    } catch (error) {
+    } catch (error: any) {
       console.error('🚫 Error al crear el grupo: ', error);
-      setErrorMessage('Error al crear el grupo. Intenta nuevamente.');
+      
+      // Verificar si el error es por nombre duplicado
+      if (error.message && error.message.includes('Ya existe un grupo con este nombre')) {
+        setErrorMessage('Ya tienes un grupo con este nombre. Por favor, elige uno diferente.');
+      } else {
+        setErrorMessage('Error al crear el grupo. Intenta nuevamente.');
+      }
     }
   };
 

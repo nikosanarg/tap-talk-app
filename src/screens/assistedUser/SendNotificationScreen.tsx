@@ -44,10 +44,7 @@ function SendNotificationScreen(): React.JSX.Element {
           pictograma_id: pictogram.id,
           grupo_id: supportGroupId,
           contenido: `${selectedCategory.nombre}: ${pictogram.nombre}`,
-          tipo: 'PICTOGRAMA',
-          fecha_creacion: new Date().toISOString(),
-          titulo: pictogram.nombre,
-          categoria: selectedCategory.nombre,
+          tipo: 'PICTOGRAMA', // El tipo debe ser 'PICTOGRAMA' o 'AYUDA' según el constraint de la BD
         };
 
         console.log('📤 Payload a la API:', notificationApiPayload);
@@ -60,7 +57,7 @@ function SendNotificationScreen(): React.JSX.Element {
           useNativeDriver: true,
         }).start();
 
-        setTimeout(() => navigation.navigate('Categories'), 8000);
+        setTimeout(() => navigation.navigate('Categories'), 5000);
 
         // Enviar notificación push al backend
         try {

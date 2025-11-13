@@ -22,14 +22,20 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   const fromSnapshot = useRef(false);
 
   const fetchNotifications = async () => {
+    console.log("🔔 fetchNotifications iniciado, supportGroup:", supportGroup?.id);
     if (!supportGroup) {
       console.log("🚫 No hay un Grupo de apoyo almacenado en la caché:", supportGroup);
       return;
     }
     try {
+      console.log("📡 Llamando a NotificationApiService.getAll()...");
       const allNotifications = await NotificationApiService.getAll();
-      const groupNotifications = allNotifications.filter(n => n.grupo_id === supportGroup.id);
-      console.log(`📩 Notificaciones descargadas para el grupo "${supportGroup.id}"`);
+      console.log(`📦 Total de notificaciones obtenidas: ${allNotifications.length}`);
+      // Traer todas las notificaciones del grupo (pendientes y resueltas, pero no borradas)
+      const groupNotifications = allNotifications.filter(
+        n => n.grupo_id === supportGroup.id
+      );
+      console.log(`📩 Notificaciones del grupo "${supportGroup.id}": ${groupNotifications.length} total`);
       setNotifications(groupNotifications);
     } catch (error) {
       console.error("🚫 Error al obtener notificaciones:", error);
@@ -37,7 +43,12 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   };
 
   useEffect(() => {
-    if (!supportGroup?.id) return;
+    console.log("🔄 useEffect de NotificationContext ejecutado, supportGroup?.id:", supportGroup?.id);
+    if (!supportGroup?.id) {
+      console.log("⚠️ No hay supportGroup.id, no se ejecuta fetchNotifications");
+      return;
+    }
+    console.log("✅ Ejecutando fetchNotifications para grupo:", supportGroup.id);
     fetchNotifications();
     // TODO: Implementar polling o websocket para actualizaciones en tiempo real
   }, [supportGroup?.id]);
@@ -60,7 +71,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     if (!supportGroup) return;
     try {
       const resolvedNotifications = notifications.filter(
-        n => n.grupo_id === supportGroup.id && n.fecha_resuelta !== null
+        n => n.grupo_id === supportGroup.id && n.estado === 'RESUELTA'
       );
       await Promise.all(resolvedNotifications.map(n => NotificationApiService.remove(n.id)));
       console.log("✅ Notificaciones resueltas eliminadas.");
@@ -73,7 +84,9 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   const getPendingNotificationCount = async (grupoId: number): Promise<number> => {
     try {
       const allNotifications = await NotificationApiService.getAll();
-      return allNotifications.filter(n => n.grupo_id === grupoId && n.fecha_resuelta === null).length;
+      return allNotifications.filter(
+        n => n.grupo_id === grupoId && n.estado === 'PENDIENTE'
+      ).length;
     } catch (error) {
       console.error("🚫 Error al obtener count de notificaciones:", error);
       return 0;
@@ -86,7 +99,7 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
       const allNotifications = await NotificationApiService.getAll();
       grupoIds.forEach(grupoId => {
         counts[grupoId] = allNotifications.filter(
-          n => n.grupo_id === grupoId && n.fecha_resuelta === null
+          n => n.grupo_id === grupoId && n.estado === 'PENDIENTE'
         ).length;
       });
     } catch (error) {

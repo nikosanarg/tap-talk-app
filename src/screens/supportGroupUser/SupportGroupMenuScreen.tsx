@@ -90,10 +90,18 @@ console.log("🔍 Grupos obtenidos:", fetchedGroups.map(g => g.nombre_paciente))
     navigation.navigate('CreateGroup');
   };
 
-  const handleClickGroup = (group: Grupo) => {
+  const handleClickGroup = async (group: Grupo) => {
     console.log(`🟢 Navegando a la Home del Grupo "${group.id}" (${group.nombre_paciente})`);
-    setSupportGroup(group)
-    navigation.navigate('SupportGroupHome');
+    try {
+      // Cargar el grupo completo con sus miembros
+      const fullGroup = await GrupoApiService.getById(group.id);
+      console.log(`🔍 Grupo completo cargado con ${fullGroup.miembros?.length || 0} miembros`);
+      setSupportGroup(fullGroup);
+      navigation.navigate('SupportGroupHome');
+    } catch (error) {
+      console.error('🚫 Error al cargar el grupo completo:', error);
+      setErrorMessage('Error al cargar los detalles del grupo');
+    }
   };
 
   return (
