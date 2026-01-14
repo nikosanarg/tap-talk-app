@@ -3,7 +3,7 @@ import { SafeAreaView, ScrollView, Text, Alert, Button } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { StyledAuthTextInput, StyledContextualView, SupportText } from '../../../styles/auth';
-import { HeaderBoldTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
+import { HeaderBoldTitle, SupportGroupListContainer, SupportGroupListContent } from '../../../styles/supportGroup';
 import { ActionButtonText, DangerActionButton, MenuActionButton } from '../../../styles/buttons';
 import Header from '../../../components/header/Header';
 import { RootStackParamList } from '../../../navigation/AppNavigator';
@@ -128,6 +128,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
         <SupportText style={{ fontSize: 18, marginVertical: 16 }}>Miembros del grupo</SupportText>
 
         <SupportGroupListContainer>
+          <SupportGroupListContent>
             {supportGroup?.miembros && supportGroup.miembros.length > 0 ? (
             supportGroup.miembros.map(member => (
               <AssistCard 
@@ -140,6 +141,7 @@ const SupportGroupEditScreen = (): React.JSX.Element => {
             ) : (
             <Text style={{ color: 'red', textAlign: 'center' }}>No hay miembros en el grupo.</Text>
             )}
+          </SupportGroupListContent>
         </SupportGroupListContainer>
 
         <StyledContextualView>

@@ -14,8 +14,14 @@ const getDefaultApiUrl = () => {
   return 'http://localhost:3000'; // iOS emulator or web
 };
 
-// Para desarrollo, ignoramos la variable de entorno y usamos siempre la lógica del emulador
+// Usar la variable de entorno API_URL si existe, si no usar la lógica del emulador
+const apiUrl = process.env.API_URL 
+  ? `https://${process.env.API_URL}` // Railway URL desde .env
+  : getDefaultApiUrl(); // Fallback a red local/emulador
+
 export const config: Config = {
-  API_URL: getDefaultApiUrl(), // Forzamos a usar la lógica del emulador
+  API_URL: apiUrl,
   FCM_KEY: process.env.FCM_KEY || '',
 };
+
+console.log('🔧 Config - API_URL:', config.API_URL);

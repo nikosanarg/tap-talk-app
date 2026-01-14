@@ -51,9 +51,11 @@ function CreateGroupScreen(): React.JSX.Element {
     } catch (error: any) {
       console.error('🚫 Error al crear el grupo: ', error);
       
-      // Verificar si el error es por nombre duplicado
-      if (error.message && error.message.includes('Ya existe un grupo con este nombre')) {
-        setErrorMessage('Ya tienes un grupo con este nombre. Por favor, elige uno diferente.');
+      // Capturar mensaje específico del backend
+      if (error.response?.data?.error) {
+        setErrorMessage(error.response.data.error);
+      } else if (error.message) {
+        setErrorMessage(error.message);
       } else {
         setErrorMessage('Error al crear el grupo. Intenta nuevamente.');
       }

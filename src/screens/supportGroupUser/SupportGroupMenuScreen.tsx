@@ -5,7 +5,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, SupportText } from '../../styles/auth';
 import { ActionButtonText, MenuActionButton } from '../../styles/buttons';
-import { SupportGroupListContainer } from '../../styles/supportGroup';
+import { SupportGroupListContainer, SupportGroupListContent } from '../../styles/supportGroup';
 import { useUser } from '../../contexts/UserContext';
 import AssistCard from '../../components/AssistCard';
 import { Picker } from '@react-native-picker/picker';
@@ -134,13 +134,15 @@ console.log("🔍 Grupos obtenidos:", fetchedGroups.map(g => g.nombre_paciente))
         {errorMessage ? <Text style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Text> : null}
 
         <SupportGroupListContainer>
-          {groups.length > 0 ? (
-            groups.map(group => (
-              <AssistCard group={group} callback={() => handleClickGroup(group)} key={group.id} pendingCount={pendingCounts[group.id] || 0}/>
-            ))
-          ) : (
-            <Text style={{ textAlign: 'center', marginTop: 10 }}>No estás unido a ningún grupo.</Text>
-          )}
+          <SupportGroupListContent>
+            {groups.length > 0 ? (
+              groups.map(group => (
+                <AssistCard group={group} callback={() => handleClickGroup(group)} key={group.id} pendingCount={pendingCounts[group.id] || 0}/>
+              ))
+            ) : (
+              <Text style={{ textAlign: 'center', marginTop: 10 }}>No estás unido a ningún grupo.</Text>
+            )}
+          </SupportGroupListContent>
         </SupportGroupListContainer>
       </ScrollView>
     </SafeAreaView>
