@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { StyledContextualView, ButtonSupportText, StyledAuthButton, StyledAuthTextInput, SupportTextAuthContainer, SupportText } from '../../styles/auth';
 import { ScreenView } from '../../styles/common';
-import firestore from '@react-native-firebase/firestore';
 import { useUser } from '../../contexts/UserContext';
 import ReturnButton from '../../components/returnButton/ReturnButton';
-import { generateRandomCode } from '../../utils/generateRandomCode';
+import { GrupoApiService } from '../../services/GrupoApiService';
+import { config } from '../../config/config';
 
 type CreateGroupScreenNavProp = StackNavigationProp<RootStackParamList, 'CreateGroup'>;
 
@@ -29,23 +29,36 @@ function CreateGroupScreen(): React.JSX.Element {
       return
     }
 
-    console.log(`🟣 Iniciando Creación de Grupo: assistedUser=${assistedUserName} | creadorId=${user.uid}`);
+    if (!assistedUserName.trim()) {
+      setErrorMessage('Por favor, ingresa el nombre del usuario asistido');
+      return;
+    }
+
+    console.log(`🟣 Iniciando Creación de Grupo: assistedUser=${assistedUserName} | creadorId=${user.user_id}`);
   
     try {
-      const groupRef = await firestore().collection('Grupos').add({
-        activo: true,
-        codigoInvitacion: generateRandomCode(16),
-        creadorId: user.uid,
-        fechaCreacion: firestore.FieldValue.serverTimestamp(),
-        miembros: [user.uid],
-        nombreAsistido: assistedUserName,
-        pictogramasPersonalizados: [],
+      // Crear el grupo usando directamente el user_id (UUID)
+      const nuevoGrupo = await GrupoApiService.create({
+        creador_id: user.user_id, // Pasamos el UUID directamente
+        nombre_paciente: assistedUserName.trim(),
+        codigo_vinculacion: '', // Se genera en el backend
+        fecha_creacion: new Date().toISOString()
       });
   
-      console.log(`✅ Grupo creado exitosamente. ID: ${groupRef.id}`);
+      console.log(`✅ Grupo creado exitosamente:`, nuevoGrupo);
+      setErrorMessage('');
       navigation.navigate('SupportGroupMenu');
-    } catch (error) {
+    } catch (error: any) {
       console.error('🚫 Error al crear el grupo: ', error);
+      
+      // Capturar mensaje específico del backend
+      if (error.response?.data?.error) {
+        setErrorMessage(error.response.data.error);
+      } else if (error.message) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('Error al crear el grupo. Intenta nuevamente.');
+      }
     }
   };
 

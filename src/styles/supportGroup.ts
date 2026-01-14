@@ -1,13 +1,17 @@
 import styled from "styled-components/native";
 
-export const SupportGroupListContainer = styled.View`
+export const SupportGroupListContainer = styled.ScrollView`
   background-color: #D4D4D4;
   width: 86%;
   min-height: 50px;
+  max-height: 500px;
   padding: 4px 2px 2px;
   margin: 0px auto;
-  display: flex;
   border-radius: 10px;
+`
+
+export const SupportGroupListContent = styled.View`
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;

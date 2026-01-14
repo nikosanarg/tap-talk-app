@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useUser } from '../../../contexts/UserContext';
 import { StyledContextualView } from '../../../styles/auth';
 import { HeaderBoldTitle, SupportGroupListContainer } from '../../../styles/supportGroup';
@@ -22,15 +22,25 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
   const navigation = useNavigation<SupportGroupHomeScreenNavProp>();
   const { user } = useUser();
   const { supportGroup } = useSupportGroup();
-  const { notifications, deleteResolvedNotifications } = useNotifications();
+  const { notifications, deleteResolvedNotifications, fetchNotifications } = useNotifications();
   const [subtitleVisible, setSubtitleVisible] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (user && supportGroup) {
-      setIsAdmin(user.uid === supportGroup.creadorId);
+      setIsAdmin(user.user_id === supportGroup.creador_id);
     }
   }, [user, supportGroup]);
+
+  // Refrescar notificaciones cuando la pantalla obtiene el foco
+  useFocusEffect(
+    React.useCallback(() => {
+      if (supportGroup?.id) {
+        console.log("🔄 SupportGroupHome obtuvo el foco, refrescando notificaciones...");
+        fetchNotifications();
+      }
+    }, [supportGroup?.id])
+  );
 
   const handleDeleteResolvedNotifications = async () => {
     await deleteResolvedNotifications();
@@ -41,18 +51,18 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
       <Header />
 
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <HeaderBoldTitle>Asistiendo a {supportGroup?.nombreAsistido || '...'}</HeaderBoldTitle>
+        <HeaderBoldTitle>Asistiendo a {supportGroup?.nombre_paciente || '...'}</HeaderBoldTitle>
 
         <TouchableMenu>
           <TouchableMenuButton title='Modificar grupo y miembros' iconName="settings" onPress={() => navigation.navigate('SupportGroupEdit')} disabled={!isAdmin} />
           <TouchableMenuButton
             title="Copiar código de invitación"
-            subtitle={supportGroup?.codigoInvitacion}
+            subtitle={supportGroup?.codigo_vinculacion}
             subtitleVisible={subtitleVisible}
             iconName="copy"
             onPress={() => {
-              if (supportGroup?.codigoInvitacion) {
-                Clipboard.setString(supportGroup.codigoInvitacion);
+              if (supportGroup?.codigo_vinculacion) {
+                Clipboard.setString(supportGroup.codigo_vinculacion);
                 setSubtitleVisible(true);
               }
             }}
@@ -62,9 +72,9 @@ const SupportGroupHomeScreen = (): React.JSX.Element => {
 
         <SupportGroupListContainer>
           {notifications.length > 0 ? (
-            notifications.map((notification: INotification, index: number) =>
+            notifications.map((notification: INotification) =>
               <NotificationCard
-                key={`${notification.titulo.replace(/\s+/g, '-')}-${index}`}
+                key={notification.id}
                 notification={notification}
               />
             )

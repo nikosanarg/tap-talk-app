@@ -1,4 +1,6 @@
-const BASE_URL = 'http://10.0.2.2:3000/api/auxiliares';
+import { config } from '../config/config';
+import { apiClient } from '../utils/apiClient';
+const BASE_URL = `${config.API_URL}/api/auxiliares`;
 
 export interface Auxiliar {
   id?: string;
@@ -11,13 +13,13 @@ export interface Auxiliar {
 
 export const AuxiliarApiService = {
   async getAll(): Promise<Auxiliar[]> {
-    const res = await fetch(BASE_URL);
+    const res = await apiClient.get(BASE_URL);
     if (!res.ok) throw new Error('Error al obtener auxiliares');
     return res.json();
   },
 
   async getById(id: string): Promise<Auxiliar> {
-    const res = await fetch(`${BASE_URL}/${id}`);
+    const res = await apiClient.get(`${BASE_URL}/${id}`);
     if (!res.ok) throw new Error('Auxiliar no encontrado');
     return res.json();
   },

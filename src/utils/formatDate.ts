@@ -1,39 +1,37 @@
-import { Timestamp } from "@react-native-firebase/firestore"
-
-export const formatDate = (dateTimestamp: Timestamp) => {
-  if (!dateTimestamp) return 'No disponible'
-  const date = dateTimestamp.toDate()
-  const day = String(date.getDate() + 1).padStart(2, '0')
+export const formatDate = (dateString: string) => {
+  if (!dateString) return 'No disponible'
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
   return `${day}/${month}/${year}`
 }
 
-export const formatHourMinutes = (dateTimestamp: Timestamp) => {
-  if (!dateTimestamp) return 'No disponible'
-  const date = dateTimestamp.toDate()
-  const hours = String(date.getHours() + 1).padStart(2, '0')
-  const minutes = String(date.getMinutes() + 1).padStart(2, '0')
+export const formatHourMinutes = (dateString: string) => {
+  if (!dateString) return 'No disponible'
+  const date = new Date(dateString)
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
   return `${hours}:${minutes}`
 }
 
-export const formatSeconds = (dateTimestamp: Timestamp) => {
-  if (!dateTimestamp) return 'No disponible'
-  const date = dateTimestamp.toDate()
-  const seconds = String(date.getSeconds() + 1).padStart(2, '0')
+export const formatSeconds = (dateString: string) => {
+  if (!dateString) return 'No disponible'
+  const date = new Date(dateString)
+  const seconds = String(date.getSeconds()).padStart(2, '0')
   return seconds
 }
 
-export const formatDateHour = (dateTimestamp: Timestamp) => {
-  if (!dateTimestamp) return 'No disponible'
-  const date = formatDate(dateTimestamp)
-  const hourMinutes = formatHourMinutes(dateTimestamp)
+export const formatDateHour = (dateString: string) => {
+  if (!dateString) return 'No disponible'
+  const date = formatDate(dateString)
+  const hourMinutes = formatHourMinutes(dateString)
   return `${date} ${hourMinutes}`
 }
 
- export const formatDateHourSeconds = (dateTimestamp: Timestamp) => {
-  if (!dateTimestamp) return 'No disponible'
-  const dateHourMinutes = formatDateHour(dateTimestamp)
-  const seconds = formatSeconds(dateTimestamp)
+export const formatDateHourSeconds = (dateString: string) => {
+  if (!dateString) return 'No disponible'
+  const dateHourMinutes = formatDateHour(dateString)
+  const seconds = formatSeconds(dateString)
   return `${dateHourMinutes}:${seconds}`
 }

@@ -1,34 +1,28 @@
-import { IFirestoreSupportGroup } from "../types/SupportGroup";
+import { Grupo } from "../services/GrupoApiService";
 
-export const mockGroups: Array<IFirestoreSupportGroup> = [
+export const mockGroups: Array<Grupo> = [
   {  
-    id: 'pg5sg0dyTrDT1ZwHUKIb',
+    id: 1,
     activo: true,
-    codigoInvitacion: '1111222233334444',
-    creadorId: 'pOn74xLZ4ifA8baHRXFYaxhHEXZ2',
-    fechaCreacion: {"nanoseconds": 293000000, "seconds": 1729962544},
-    miembros: ['pOn74xLZ4ifA8baHRXFYaxhHEXZ2'],
-    nombreAsistido: 'Juan',
-    pictogramasPersonalizados: []
+    codigo_vinculacion: '1111222233334444',
+    creador_id: 'pOn74xLZ4ifA8baHRXFYaxhHEXZ2',
+    fecha_creacion: '2024-10-26T12:15:44.293Z',
+    nombre_paciente: 'Juan',
   },
   {  
-    id: '4321432143214321',
+    id: 2,
     activo: true,
-    codigoInvitacion: '0000000000000002',
-    creadorId: 'pOn74xLZ4ifA8baHRXFYaxhHEXZ2',
-    fechaCreacion: {"nanoseconds": 293000000, "seconds": 1729962544},
-    miembros: ['pOn74xLZ4ifA8baHRXFYaxhHEXZ2'],
-    nombreAsistido: 'Maria No tocar',
-    pictogramasPersonalizados: []
+    codigo_vinculacion: '0000000000000002',
+    creador_id: 'pOn74xLZ4ifA8baHRXFYaxhHEXZ2',
+    fecha_creacion: '2024-10-26T12:15:44.293Z',
+    nombre_paciente: 'Maria No tocar',
   },
   {  
-    id: '1234123412341234',
+    id: 3,
     activo: true,
-    codigoInvitacion: '0000000000000003',
-    creadorId: 'pOn74xLZ4ifA8baHRXFYaxhHEXZ2',
-    fechaCreacion: {"nanoseconds": 293000000, "seconds": 1729962544},
-    miembros: ['pOn74xLZ4ifA8baHRXFYaxhHEXZ2'],
-    nombreAsistido: 'Eusebio No tocar',
-    pictogramasPersonalizados: []
+    codigo_vinculacion: '0000000000000003',
+    creador_id: 'pOn74xLZ4ifA8baHRXFYaxhHEXZ2',
+    fecha_creacion: '2024-10-26T12:15:44.293Z',
+    nombre_paciente: 'Eusebio No tocar',
   },
 ];

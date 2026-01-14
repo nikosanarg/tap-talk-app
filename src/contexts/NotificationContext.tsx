@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
-import firestore from '@react-native-firebase/firestore';
 import { useSupportGroup } from './SupportGroupContext';
 import { INotification } from '../types/Notification';
+import { NotificationApiService } from '../services/NotificationApiService';
 
 interface NotificationContextType {
   notifications: INotification[];
@@ -10,8 +10,8 @@ interface NotificationContextType {
   deleteResolvedNotifications: () => Promise<void>;
   fromSnapshot: React.MutableRefObject<boolean>;
   fetchNotifications: () => Promise<void>;
-  getPendingNotificationCount: (grupoId: string) => Promise<number>;
-  getPendingNotificationCounts: (grupoIds: string[]) => Promise<Record<string, number>>;
+  getPendingNotificationCount: (grupoId: number) => Promise<number>;
+  getPendingNotificationCounts: (grupoIds: number[]) => Promise<Record<number, number>>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -22,70 +22,45 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
   const fromSnapshot = useRef(false);
 
   const fetchNotifications = async () => {
+    console.log("🔔 fetchNotifications iniciado, supportGroup:", supportGroup?.id);
     if (!supportGroup) {
       console.log("🚫 No hay un Grupo de apoyo almacenado en la caché:", supportGroup);
       return;
     }
     try {
-      const notificationsSnapshot = await firestore()
-        .collection('Notificaciones')
-        .where('grupoId', '==', supportGroup.id)
-        .orderBy('fechaCreacion', 'desc')
-        .get();
-
-      const fetchedNotifications = notificationsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as INotification[];
-
-      console.log(`📩 Notificaciones descargadas para el grupo "${supportGroup.id}"`);
-      setNotifications(fetchedNotifications);
+      console.log("📡 Llamando a NotificationApiService.getAll()...");
+      const allNotifications = await NotificationApiService.getAll();
+      console.log(`📦 Total de notificaciones obtenidas: ${allNotifications.length}`);
+      // Traer todas las notificaciones del grupo (pendientes y resueltas, pero no borradas)
+      const groupNotifications = allNotifications.filter(
+        n => n.grupo_id === supportGroup.id
+      );
+      console.log(`📩 Notificaciones del grupo "${supportGroup.id}": ${groupNotifications.length} total`);
+      setNotifications(groupNotifications);
     } catch (error) {
       console.error("🚫 Error al obtener notificaciones:", error);
     }
   };
 
   useEffect(() => {
-    if (!supportGroup?.id) return;
-
+    console.log("🔄 useEffect de NotificationContext ejecutado, supportGroup?.id:", supportGroup?.id);
+    if (!supportGroup?.id) {
+      console.log("⚠️ No hay supportGroup.id, no se ejecuta fetchNotifications");
+      return;
+    }
+    console.log("✅ Ejecutando fetchNotifications para grupo:", supportGroup.id);
     fetchNotifications();
-
-    const unsubscribe = firestore()
-      .collection('Notificaciones')
-      .where('grupoId', '==', supportGroup.id)
-      .orderBy('fechaCreacion', 'desc')
-      .onSnapshot(snapshot => {
-        fromSnapshot.current = true;
-        const fetchedNotifications = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as INotification[];
-
-        console.log(`🔔 Notificaciones actualizadas para el grupo "${supportGroup.id}"`);
-        setNotifications(fetchedNotifications);
-      }, error => {
-        console.error("🚫 Error en la suscripción de notificaciones:", error);
-      });
-
-    return () => unsubscribe();
+    // TODO: Implementar polling o websocket para actualizaciones en tiempo real
   }, [supportGroup?.id]);
 
   const deleteAllNotifications = async () => {
     fromSnapshot.current = false;
     if (!supportGroup) return;
     try {
-      const notificationsSnapshot = await firestore()
-        .collection('Notificaciones')
-        .where('grupoId', '==', supportGroup.id)
-        .get();
-
-      const batch = firestore().batch();
-      notificationsSnapshot.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-
-      await batch.commit();
+      const groupNotifications = notifications.filter(n => n.grupo_id === supportGroup.id);
+      await Promise.all(groupNotifications.map(n => NotificationApiService.remove(n.id)));
       console.log("✅ Todas las notificaciones eliminadas.");
+      setNotifications([]);
     } catch (error) {
       console.error("🚫 Error al eliminar notificaciones:", error);
     }
@@ -95,43 +70,41 @@ export const NotificationsProvider = ({ children }: { children: ReactNode }) => 
     fromSnapshot.current = false;
     if (!supportGroup) return;
     try {
-      const notificationsSnapshot = await firestore()
-        .collection('Notificaciones')
-        .where('grupoId', '==', supportGroup.id)
-        .where('fechaResuelta', '!=', null)
-        .get();
-
-      const batch = firestore().batch();
-      notificationsSnapshot.forEach(doc => {
-        batch.delete(doc.ref);
-      });
-
-      await batch.commit();
+      const resolvedNotifications = notifications.filter(
+        n => n.grupo_id === supportGroup.id && n.estado === 'RESUELTA'
+      );
+      await Promise.all(resolvedNotifications.map(n => NotificationApiService.remove(n.id)));
       console.log("✅ Notificaciones resueltas eliminadas.");
+      setNotifications(prev => prev.filter(n => !resolvedNotifications.some(rn => rn.id === n.id)));
     } catch (error) {
       console.error("🚫 Error al eliminar notificaciones resueltas:", error);
     }
   };
 
-  const getPendingNotificationCount = async (grupoId: string): Promise<number> => {
-    const snapshot = await firestore()
-      .collection('Notificaciones')
-      .where('grupoId', '==', grupoId)
-      .where('fechaResuelta', '==', null)
-      .get();
-    return snapshot.size;
+  const getPendingNotificationCount = async (grupoId: number): Promise<number> => {
+    try {
+      const allNotifications = await NotificationApiService.getAll();
+      return allNotifications.filter(
+        n => n.grupo_id === grupoId && n.estado === 'PENDIENTE'
+      ).length;
+    } catch (error) {
+      console.error("🚫 Error al obtener count de notificaciones:", error);
+      return 0;
+    }
   };
 
-  const getPendingNotificationCounts = async (grupoIds: string[]): Promise<Record<string, number>> => {
-    const counts: Record<string, number> = {};
-    await Promise.all(grupoIds.map(async (grupoId) => {
-      const snapshot = await firestore()
-        .collection('Notificaciones')
-        .where('grupoId', '==', grupoId)
-        .where('fechaResuelta', '==', null)
-        .get();
-      counts[grupoId] = snapshot.size;
-    }));
+  const getPendingNotificationCounts = async (grupoIds: number[]): Promise<Record<number, number>> => {
+    const counts: Record<number, number> = {};
+    try {
+      const allNotifications = await NotificationApiService.getAll();
+      grupoIds.forEach(grupoId => {
+        counts[grupoId] = allNotifications.filter(
+          n => n.grupo_id === grupoId && n.estado === 'PENDIENTE'
+        ).length;
+      });
+    } catch (error) {
+      console.error("🚫 Error al obtener counts de notificaciones:", error);
+    }
     return counts;
   };
 

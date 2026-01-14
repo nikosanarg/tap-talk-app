@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import firestore from '@react-native-firebase/firestore';
+import { config } from '../config/config';
 
 type BackendIpContextType = {
   backendIp: string | null;
@@ -11,21 +11,22 @@ export const BackendIpProvider = ({ children }: { children: ReactNode }) => {
   const [backendIp, setBackendIp] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchBackendIp = async () => {
+    // Extraer solo la IP del config.API_URL (formato: http://IP:PORT)
+    const extractIpFromUrl = (url: string): string | null => {
       try {
-        const doc = await firestore().collection('Constantes').doc('backendip').get();
-        if (doc.exists) {
-          const ip = doc.data()?.valor;
-          setBackendIp(ip);
-        } else {
-          console.error('Error al obtener la dirección IP de la API');
-        }
-      } catch (error) {
-        console.error('Error al obtener la dirección IP de la API:', error);
+        const match = url.match(/https?:\/\/([^:]+)/);
+        return match ? match[1] : null;
+      } catch {
+        return null;
       }
     };
 
-    fetchBackendIp();
+    const ip = extractIpFromUrl(config.API_URL);
+    setBackendIp(ip);
+    
+    if (!ip) {
+      console.error('Error al extraer la dirección IP de config.API_URL');
+    }
   }, []);
 
   return (

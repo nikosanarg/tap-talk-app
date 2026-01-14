@@ -26,6 +26,9 @@ export const PictogramIconBox = styled(TactileSelectionBox)`
   height: 140px;
   margin: 8px;
   background-color: #FFFFFF;
+  border-width: 3px;
+  border-color: #333333;
+  border-style: solid;
 `;
 
 export const PictogramText = styled.Text`

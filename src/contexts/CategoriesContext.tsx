@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import firestore from '@react-native-firebase/firestore';
 import { CategoriesContextType, ICategory } from '../types/Category';
 import { IPictogram } from '../types/Pictogram';
+import { CategoriaApiService } from '../services/CategoriaApiService';
+import { PictogramaApiService } from '../services/PictogramaApiService';
 
 const CategoriesContext = createContext<CategoriesContextType | undefined>(undefined);
 
@@ -15,18 +16,14 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   const fetchCategories = async () => {
     console.log('🟢 Iniciando fetch de Categorías');
     try {
-      const categorySnapshot = await firestore().collection('Categorías').where('activo', '==', true).get();
-      const fetchedCategories = categorySnapshot.docs.map(doc => ({
-        ...(doc.data() as ICategory),
-        id: doc.id,
-      }));
+      const fetchedCategories = await CategoriaApiService.getAll();
       setCategories(fetchedCategories);
-      // fetchAllPictograms({ categories: fetchedCategories });
+      await fetchAllPictograms({ categories: fetchedCategories });
       return fetchedCategories;
-    } catch (err) {
+    } catch (err: any) {
       console.error('🚫 Error al obtener categorías:', err);
-      setError(`Error al cargar las categorías: ${err}`);
-      return []
+      // Propagar el error UNAUTHORIZED para que el componente lo maneje
+      throw err;
     }
   };
 
@@ -37,26 +34,20 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
       return {};
     }
     try {
+      const allPictograms = await PictogramaApiService.getAll();
       const pictogramsByCategory: Record<string, IPictogram[]> = {};
+      
       for (const category of categories) {
-        const pictogramsSnapshot = await firestore()
-          .collection('Categorías')
-          .doc(category.id)
-          .collection('Pictogramas')
-          .where('activo', '==', true)
-          .get();
-        const pictograms = pictogramsSnapshot.docs.map(doc => ({
-          ...(doc.data() as IPictogram),
-          id: doc.id,
-        }));
+        const pictograms = allPictograms.filter(p => p.categoria_id === category.id && p.activo);
         pictogramsByCategory[category.id] = pictograms;
       }
+      
       setPictograms(pictogramsByCategory);
       return pictogramsByCategory;
-    } catch (err) {
+    } catch (err: any) {
       console.error('🚫 Error al obtener pictogramas:', err);
-      setError(`Error al cargar los pictogramas: ${err}`);
-      return {};
+      // Propagar el error UNAUTHORIZED para que el componente lo maneje
+      throw err;
     }
   };
 
@@ -75,9 +66,15 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
           .join(', ')
       );
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error('🚫 Error al inicializar categorías y pictogramas:', error);
-      setError(`Error al inicializar: ${error}`);
+      
+      // Si es error de autenticación, propagar para que el componente lo maneje
+      if (error.message === 'UNAUTHORIZED') {
+        throw error;
+      }
+      
+      setError(`Error al inicializar: ${error.message || error}`);
       initStatus = false
     } finally {
       setLoading(false);

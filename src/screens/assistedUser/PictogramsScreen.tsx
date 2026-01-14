@@ -27,11 +27,10 @@ function PictogramsScreen(): React.JSX.Element {
       console.log('🚫 Error: Categoría no seleccionada');
       return;
     }
-    console.log(`🟢 Categoría seleccionada: ${selectedCategory.nombre} (ID ${selectedCategory.id})`);
+    
+    console.log(`🎨 Categoría: ${selectedCategory.nombre}, Color: ${selectedCategory.color}`);
     setCategoryColor(selectedCategory.color || '#e0e0e0');
     const fetchedPictograms = pictograms[selectedCategory.id] || basicPictograms[selectedCategory.nombre as keyof typeof basicPictograms] || [];
-    console.log(`👜 Pictogramas en PictogramsScreen: ${fetchedPictograms?.map((p: IPictogram) => p.nombre)}`);
-
     setCategoryPictograms(fetchedPictograms);
   }, [selectedCategory, pictograms]);
 
@@ -44,29 +43,36 @@ function PictogramsScreen(): React.JSX.Element {
   };
 
   const getButtonPictogramToShow = (pictogram: IPictogram, categoryColor: string) => {
-    if (pictogram.icono !== "") {
+    console.log(`🎨 Renderizando ${pictogram.nombre}: color="${categoryColor}", icono="${pictogram.icono}"`);
+    if (pictogram.icono && pictogram.icono !== "") {
       return (
-          <Icon name={pictogram.icono || 'search-off'} size={128} color={categoryColor || '#9E9E9E'} />
+        <Icon name={pictogram.icono} size={80} color={categoryColor || '#333333'} />
+      );
+    } else if (pictogram.imagen_url) {
+      return (
+        <ImageBackground
+          source={{ uri: pictogram.imagen_url }}
+          style={{ width: '100%', height: '100%' }}
+          imageStyle={{ borderRadius: 16 }}
+        />
       );
     } else {
       return (
-          <ImageBackground
-            source={{ uri: pictogram.imagenUrl || EMPTY_ICON_PLACEHOLDER }}
-            style={{ width: '100%', height: '100%' }}
-            imageStyle={{ borderRadius: 16 }}
-          />
+        <Icon name="help-outline" size={80} color="#999999" />
       );
     }
   }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: categoryColor }}>
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 36 }}>
-          Pictogramas
+      <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ flex: 1 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 36, color: '#000000' }}>
+          Pictogramas - {selectedCategory?.nombre}
         </Text>
         {categoryPictograms.length === 0 ? (
-          <Text style={{ textAlign: 'center', marginVertical: 20 }}>No hay pictogramas disponibles.</Text>
+          <Text style={{ textAlign: 'center', marginVertical: 20, color: '#000000', fontSize: 18 }}>
+            No hay pictogramas disponibles.
+          </Text>
         ) : (
           <PictogramsScreenContainer>
             <StyledPictogramsContainer>
@@ -74,11 +80,12 @@ function PictogramsScreen(): React.JSX.Element {
                 <TouchableOpacity
                   key={pictogram.id}
                   onPress={() => handlePictogramPress(pictogram)}
+                  style={{ margin: 8 }}
                 >
                   <PictogramIconBox>
                     {getButtonPictogramToShow(pictogram, categoryColor)}
                   </PictogramIconBox>
-                  <PictogramText>{pictogram.nombre}</PictogramText>
+                  <PictogramText style={{ color: '#000000' }}>{pictogram.nombre}</PictogramText>
                 </TouchableOpacity>
               ))}
             </StyledPictogramsContainer>
